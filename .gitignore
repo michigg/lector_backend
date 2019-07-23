@@ -1,4 +1,7 @@
 .idea/
+logs/
+graphs/
+*-gh/
 # ---> Python
 # Byte-compiled / optimized / DLL files
 __pycache__/
