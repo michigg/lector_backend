@@ -1,0 +1,3 @@
+[submodule "docker/ors"]
+	path = docker/ors
+	url = https://github.com/GIScience/openrouteservice.git
