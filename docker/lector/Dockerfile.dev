@@ -12,16 +12,25 @@ RUN apk upgrade --update && \
         py-gdal \
         geos \
         py3-pandas \
+        py-numpy-dev \
         proj \
         proj-util \
-        proj-dev && \
+        proj-dev \
+        freetype-dev \
+        py3-psycopg2 \
+        git \
+        cmake && \
         rm -rf /var/cache/apk/*
-#RUN ln -s /usr/lib/libgeos_c.so.1 /usr/local/lib/libgeos_c.so
-#RUN ln -s /usr/lib/libgdal.so.20.1.3 /usr/lib/libgdal.so
 RUN pip3 install -r /requirements.txt && rm /requirements.txt
+RUN echo "**** compile spatialindex ****" && \
+    git clone https://github.com/libspatialindex/libspatialindex /tmp/spatialindex && \
+    cd /tmp/spatialindex && \
+    cmake . -DCMAKE_INSTALL_PREFIX=/usr && \
+    make && \
+    make install
+
 WORKDIR /lector
 EXPOSE 80
 
-COPY entrypoint.sh /
 ENTRYPOINT ["python3", "manage.py"]
 CMD ["runserver", "0.0.0.0:80"]

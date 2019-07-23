@@ -9,13 +9,15 @@ services:
     image: lector:0.1
     build:
       context: docker
-      dockerfile: Dockerfile.dev
+      dockerfile: docker/lector/Dockerfile.dev
     networks:
       - pg_db
     env_file:
-      - docker/dev.env
+      - docker/lector/dev.env
     volumes:
       - ./src:/lector
+      - ./osm_data:/osm_data
+      - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - dblector
     ports:
@@ -28,4 +30,21 @@ services:
     volumes:
       - ./db/pgdata/:/var/lib/postgresql/data/
     env_file:
-      - docker/dev.env
+      - docker/lector/dev.env
+
+  ors:
+    ports:
+      - 8989:8080
+    build:
+      context: ./docker/ors
+      args:
+        APP_CONFIG: ./docker/conf/app.config.sample
+        OSM_FILE: ./docker/data/heidelberg.osm.gz
+    volumes:
+      - ./graphs:/ors-core/data/graphs
+      - ./elevation_cache:/ors-core/data/elevation_cache
+      - ./logs/ors/:/var/log/ors/
+      - ./logs/tomcat/:/usr/local/tomcat/logs
+    environment:
+      - JAVA_OPTS=-Djava.awt.headless=true -server -XX:TargetSurvivorRatio=75 -XX:SurvivorRatio=64 -XX:MaxTenuringThreshold=3 -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:ParallelGCThreads=4 -Xms1g -Xmx2g
+      - CATALINA_OPTS= -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9001 -Dcom.sun.management.jmxremote.rmi.port=9001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=localhost
