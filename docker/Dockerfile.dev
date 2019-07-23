@@ -16,10 +16,9 @@ RUN apk upgrade --update && \
         proj \
         proj-util \
         proj-dev \
-        freetype-dev && \
+        freetype-dev \
+        py3-psycopg2 && \
         rm -rf /var/cache/apk/*
-#RUN ln -s /usr/lib/libgeos_c.so.1 /usr/local/lib/libgeos_c.so
-#RUN ln -s /usr/lib/libgdal.so.20.1.3 /usr/lib/libgdal.so
 RUN pip3 install -r /requirements.txt && rm /requirements.txt
 WORKDIR /lector
 EXPOSE 80
