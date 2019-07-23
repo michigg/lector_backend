@@ -30,6 +30,7 @@ RUN echo "**** compile spatialindex ****" && \
     make install
 
 WORKDIR /lector
+
 EXPOSE 80
 
 ENTRYPOINT ["python3", "manage.py"]
