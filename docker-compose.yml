@@ -1,0 +1,31 @@
+version: "3"
+
+networks:
+  pg_db:
+    external: false
+
+services:
+  lector:
+    image: lector:0.1
+    build:
+      context: docker
+      dockerfile: Dockerfile.dev
+    networks:
+      - pg_db
+    env_file:
+      - docker/dev.env
+    volumes:
+      - ./src:/lector
+    depends_on:
+      - dblector
+    ports:
+      - 0.0.0.0:8888:80
+
+  dblector:
+    image: postgres:11.4-alpine
+    networks:
+      - pg_db
+    volumes:
+      - ./db/pgdata/:/var/lib/postgresql/data/
+    env_file:
+      - docker/dev.env
