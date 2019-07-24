@@ -37,6 +37,7 @@ services:
     command: /data/data.osm
     volumes:
       - ./osm_data:/data
+      - ./docker/graphhopper/config.yml:/graphhopper/config.yml
     ports:
       - 8989:8989
 
