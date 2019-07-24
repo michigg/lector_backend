@@ -17,6 +17,7 @@ services:
     volumes:
       - ./src:/lector
       - ./osm_data:/osm_data
+      - ./open_spaces:/open_spaces
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - dblector
