@@ -2,6 +2,7 @@
 logs/
 graphs/
 osm_data/
+cache/
 # ---> Python
 # Byte-compiled / optimized / DLL files
 __pycache__/
