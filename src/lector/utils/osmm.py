@@ -4,6 +4,7 @@ import json
 
 import docker
 import osmnx as ox
+from pprint import pprint
 
 ox.config(log_console=True, use_cache=True)
 
@@ -14,155 +15,205 @@ OSM_OUTPUT_FILENAME = "data"
 OSM_OUTPUT_DIR = "/osm_data"
 
 
-def download_map():
-    # G = ox.graph_from_bbox(49.925145775384436, 49.865874134216426, 10.951995849609375, 10.836982727050781,
-    #                        network_type='all', truncate_by_edge=True)
-    # G = ox.graph_from_address('350 5th Ave, New York, New York', network_type='all')
-    # G = ox.graph_from_address('Berlin, 10117, Deutschland', network_type='all')
-    # G = ox.graph_from_address('Bamberg, Oberfranken, Bayern, 96047, Deutschland', network_type='all', distance=5000)
-    # G = ox.graph_from_address('Erlangen, Mittelfranken, Bayern, 91052, Deutschland', network_type='all')
-    G = ox.graph_from_address('Markusplatz, Bamberg, Oberfranken, Bayern, 96047, Deutschland', network_type='all',
-                              distance=300)
-    test_visablity_graph(G)
-    plot_graph(G)
-    print("GRAPH PLOTTED")
-    ox.save_graph_osm(G, filename=f'{OSM_OUTPUT_FILENAME}.osm', folder=OSM_OUTPUT_DIR)
-    remove_current_graphhopper_data()
-    restart_container_by_service_name(SERVICE_NAME)
+class DockerController:
+    @staticmethod
+    def get_container_by_service_name(service_name):
+        # TODO check multiple container
+        client = docker.from_env()
+        for container in client.containers.list(all=True):
+            pattern = re.compile(f'.*{service_name}.*')
+            if pattern.match(container.name):
+                return container
+
+    def restart_container_by_service_name(self, service_name):
+        container = self.get_container_by_service_name(service_name)
+        # TODO logging if container is not running
+        if container:
+            container.restart()
 
 
-def load_map():
-    return ox.graph_from_file(f'{OSM_OUTPUT_DIR}/{OSM_OUTPUT_FILENAME}.osm')
+class DockerGraphhopperController(DockerController):
+    def __init__(self, graphhopper_service_name=SERVICE_NAME, osm_output_dir=OSM_OUTPUT_DIR,
+                 osm_output_filename=OSM_OUTPUT_FILENAME):
+        self.graphhopper_service_name = graphhopper_service_name
+        self.osm_output_dir = osm_output_dir
+        self.osm_output_filename = osm_output_filename
+
+    def clean_graphhopper_restart(self):
+        self._remove_current_graphhopper_data()
+        self.restart_container_by_service_name(self.graphhopper_service_name)
+
+    @staticmethod
+    def _remove_current_graphhopper_data():
+        shutil.rmtree(f'{OSM_OUTPUT_DIR}/{OSM_OUTPUT_FILENAME}-gh', ignore_errors=True)
 
 
-def get_container_by_service_name(name):
-    # TODO check multiple container
-    client = docker.from_env()
-    for container in client.containers.list(all=True):
-        pattern = re.compile(f'.*{name}.*')
-        if pattern.match(container.name):
-            return container
+class OSMManipulator:
+    def __init__(self, node_id_start=0):
+        self.current_node_id = node_id_start
+        self.gh_docker_controller = DockerGraphhopperController()
 
+    @staticmethod
+    def download_map():
+        import osmnx as ox
+        graph = ox.graph_from_address('Markusplatz, Bamberg, Oberfranken, Bayern, 96047, Deutschland',
+                                      network_type='all',
+                                      distance=300)
+        print("LOADED", graph)
+        return graph
 
-def restart_container_by_service_name(container_name):
-    container = get_container_by_service_name(container_name)
-    # TODO logging if container is not running
-    if container:
-        container.restart()
+    @staticmethod
+    def load_map():
+        return ox.graph_from_file(f'{OSM_OUTPUT_DIR}/{OSM_OUTPUT_FILENAME}.osm')
 
+    @staticmethod
+    def load_geojson():
+        with open('/open_spaces/markusplatz.geojson') as f:
+            return json.load(f)
 
-def remove_current_graphhopper_data():
-    shutil.rmtree(f'{OSM_OUTPUT_DIR}/{OSM_OUTPUT_FILENAME}-gh', ignore_errors=True)
+    @staticmethod
+    def plot_graph(G):
+        ox.plot_graph(G, save=True, file_format='svg', filename=f'{OSM_OUTPUT_DIR}/network_plot')
 
+    @staticmethod
+    def save_graph(G):
+        ox.save_graph_osm(G, filename=f'{OSM_OUTPUT_FILENAME}.osm', folder=OSM_OUTPUT_DIR)
 
-def plot_graph(G):
-    ox.plot_graph(G, save=True, file_format='svg', filename=f'{OSM_OUTPUT_DIR}/network_plot')
+    def get_polygons(self, geojson):
+        walkables = []
+        restricted = []
+        for feature in geojson['features']:
+            if "walkable" in feature['properties']:
+                if feature['properties']['walkable'] == 'True':
+                    walkables.append(feature['geometry']['coordinates'][0])
+                else:
+                    restricted.append(feature['geometry']['coordinates'][0])
+        return walkables, restricted
 
+    def get_entry_points(self, geojson):
+        entry_points = []
+        for feature in geojson['features']:
+            if "entry" in feature['properties'] and feature['properties']['entry'] == "True":
+                entry_points.append(feature['geometry']['coordinates'])
+        return entry_points
 
-def load_geojson():
-    with open('/open_spaces/markusplatz.geojson') as f:
-        return json.load(f)
+    def get_polygon(self, geojson):
+        walkables, restricted = self.get_polygons(geojson)
+        return {'walkables': walkables, 'restricted': restricted}
 
+    def add_osm_node(self, G, node_id, coords):
+        G.add_node(node_id, osmid=node_id, x=coords[0], y=coords[1])
 
-def get_polygon_from_geojson():
-    return load_geojson()['features'][0]['geometry']['coordinates'][0]
+    def add_osm_edge(self, G, from_id, to_id):
+        G.add_edge(from_id, to_id,
+                   highway='pedestrian',
+                   lanes='1',
+                   name='Test',
+                   oneway=True,
+                   length=10)
 
+    def add_open_space_to_graph(self, G, open_space):
+        open_space_nodes = {'walkables': [], 'restricted': []}
+        for walkable in open_space['walkables']:
+            walkable_nodes = self.add_polygon_to_graph(G, walkable)
+            open_space_nodes['walkables'].append(walkable_nodes)
+        for restricted in open_space['restricted']:
+            restricted_nodes = self.add_polygon_to_graph(G, restricted)
+            open_space_nodes['restricted'].append(restricted_nodes)
+        return open_space_nodes
 
-def add_node_as_osm_node(G, node_id, coords):
-    G.add_node(node_id, osmid=node_id, x=coords[0], y=coords[1])
+    def add_polygon_to_graph(self, G, walkables):
+        self.current_node_id += 1
+        origin = walkables.pop()
+        self.add_osm_node(G, self.current_node_id, origin)
+        nodes = [{'node_id': self.current_node_id, 'coord': origin}]
+        self.current_node_id += 1
+        for coord in walkables:
+            self.add_osm_node(G, self.current_node_id, coord)
+            self.add_osm_edge(G, nodes[-1]['node_id'], self.current_node_id)
+            nodes.append({'node_id': self.current_node_id, 'coord': coord})
+            self.current_node_id += 1
+        self.add_osm_edge(G, nodes[-1]['node_id'], nodes[0]['node_id'])
+        return nodes
 
+    def add_entry_point_edges(self, G, nodes):
+        for node in nodes:
+            self.add_osm_edge(G, node['node_id'], node['entry_point_id'])
 
-def add_osm_edge(G, from_id, to_id):
-    G.add_edge(from_id, to_id, attr_dict={'length': 10})
+    def add_nodes(self, G, nodes):
+        current_node_id = 0
+        node_ids = []
+        for node in nodes:
+            latitude = node[1]
+            longitude = node[0]
+            G.add_node(current_node_id, osmid=current_node_id, x=longitude, y=latitude)
+            node_ids.append(current_node_id)
+            current_node_id += 1
+        print(G.nodes.data())
+        return node_ids
 
+    def create_edges_between_all_nodes(self, G, node_ids):
+        for node_id_from in node_ids:
+            for node_id_to in node_ids:
+                if node_id_from < node_id_to:
+                    # TODO: distance calculation
+                    G.add_edge(node_id_from, node_id_to, attr_dict={'length': 10, 'highway': 'pedestrian'})
 
-def add_open_space_to_graph(G, coords_dict):
-    current_node_id = 0
+    def create_visibility_graph(self, G, polygon_coordinates):
+        node_ids = self.add_nodes(G, polygon_coordinates)
+        self.create_edges_between_all_nodes(G, node_ids)
 
-    origin = coords_dict.pop()
-    add_node_as_osm_node(G, current_node_id, origin['coord'])
-    nodes = [{'node_id': current_node_id, 'coord': origin['coord'], 'entry_point_id': origin['entry_point_id']}]
-    add_osm_edge(G, current_node_id, origin['entry_point_id'])
-    current_node_id += 1
+    def test_visablity_graph(self, G):
+        coord_dict = self.get_entry_points(G, self.get_polygon_from_geojson())
+        nodes = self.add_open_space_to_graph(G, coord_dict)
+        self.add_entry_point_edges(G, nodes)
 
-    for node in coords_dict:
-        add_node_as_osm_node(G, current_node_id, node['coord'])
-        add_osm_edge(G, nodes[-1]['node_id'], current_node_id)
-        nodes.append({'node_id': current_node_id, 'coord': node['coord'], 'entry_point_id': node['entry_point_id']})
-        current_node_id += 1
-    return nodes
+    def get_connection_points(self, entry_points):
+        entry_point_street_node_map = []
+        for entry_point in entry_points:
+            node, dist = ox.get_nearest_node(G, self.get_inverse_coord(entry_point), return_dist=True)
+            print(dist)
+            entry_point_street_node_map.append({'street_node_id': node, 'entry_coord': entry_point})
+        return entry_point_street_node_map
 
+    def add_entry_point_connection(self, G, entry_point_street_node_map):
+        for point_obj in entry_point_street_node_map:
+            node, dist = ox.get_nearest_node(G, self.get_inverse_coord(point_obj['entry_coord']), return_dist=True)
+            print(dist)
+            self.add_osm_edge(G, node, point_obj['street_node_id'])
 
-def add_entry_point_edges(G, nodes):
-    for node in nodes:
-        add_osm_edge(G, node['node_id'], node['entry_point_id'])
+    def get_inverse_coord(self, coord):
+        return [coord[1], coord[0]]
 
+    def insert_open_space(self, G):
+        geojson = self.load_geojson()
+        open_space = self.get_polygon(geojson)
+        entry_points = self.get_entry_points(geojson)
+        entry_points_map = self.get_connection_points(entry_points)
+        open_space_nodes = self.add_open_space_to_graph(G, open_space)
+        self.add_entry_point_connection(G, entry_points_map)
 
-def get_entry_points(G, coords):
-    entry_points = []
-    for coord in coords:
-        point = (coord[1], coord[0])
-        node_id, dist = ox.get_nearest_node(G, point, return_dist=True)
-        print(dist)
-        entry_points.append({'coord': coord, 'entry_point_id': node_id})
-    return entry_points
-
-
-def add_nodes(G, nodes):
-    current_node_id = 0
-    node_ids = []
-    for node in nodes:
-        latitude = node[1]
-        longitude = node[0]
-        # print(G.nodes.data())
-        # node, dist = ox.get_nearest_node(G, (latitude, longitude), return_dist=True)
-        # print(node, dist)
-        G.add_node(current_node_id, osmid=current_node_id, x=longitude, y=latitude)
-        # G.add_node(node, osmid=node, x=longitude, y=latitude)
-        # print("NODE ADDED")
-        # G.add_edge(G, current_node_id, 0)
-        # print("EDGE ADDED")
-        # print(G.nodes.data())
-        node_ids.append(current_node_id)
-        current_node_id += 1
-    print(G.nodes.data())
-    return node_ids
-
-
-def create_edges_between_all_nodes(G, node_ids):
-    for node_id_from in node_ids:
-        for node_id_to in node_ids:
-            if node_id_from < node_id_to:
-                # TODO: distance calculation
-                G.add_edge(node_id_from, node_id_to, attr_dict={'length': 10})
-
-
-def create_visibility_graph(G, polygon_coordinates):
-    node_ids = add_nodes(G, polygon_coordinates)
-    create_edges_between_all_nodes(G, node_ids)
-
-
-def test_visablity_graph(G):
-    coord_dict = get_entry_points(G, get_polygon_from_geojson())
-    nodes = add_open_space_to_graph(G, coord_dict)
-    add_entry_point_edges(G, nodes)
+    def test_open_space(self):
+        G = OSMManipulator.download_map()
+        G = ox.graph_from_address('Markusplatz, Bamberg, Oberfranken, Bayern, 96047, Deutschland', network_type='all',
+                                  distance=300)
+        print(G)
+        self.insert_open_space(G)
+        self.gh_docker_controller.clean_graphhopper_restart()
 
 
 if __name__ == '__main__':
-    # G = ox.graph_from_address('Bamberg, Oberfranken, Bayern, 96047, Deutschland', network_type='all', distance=500)
     G = ox.graph_from_address('Markusplatz, Bamberg, Oberfranken, Bayern, 96047, Deutschland', network_type='all',
                               distance=300)
-    # G = ox.graph_from_bbox(49.925145775384436, 49.865874134216426, 10.951995849609375, 10.836982727050781,
-    #                        network_type='all', truncate_by_edge=True)
-    # test_visablity_graph(G)
-    # coord_dict = get_entry_points(G, get_polygon_from_geojson())
-    # nodes = add_open_space_to_graph(G, coord_dict)
-    # add_entry_point_edges(G, nodes)
+    # pprint(G.edges.data())
+    osmman = OSMManipulator()
+    osmman.insert_open_space(G)
+    osmman.gh_docker_controller.clean_graphhopper_restart()
 
-    # print(G.nodes.data())
-    # print(G.edges.data())
-    nodes = add_nodes(G, get_polygon_from_geojson())
-    create_edges_between_all_nodes(G, nodes)
     print("GRAPH LOADED")
-    plot_graph(G)
+    osmman.plot_graph(G)
     print("GRAPH PLOTTED")
+    osmman.save_graph(G)
+
+    gh_controller = DockerGraphhopperController()
+    gh_controller.clean_graphhopper_restart()
