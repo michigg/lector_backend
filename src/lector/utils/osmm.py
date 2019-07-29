@@ -4,7 +4,10 @@ import json
 
 import docker
 import osmnx as ox
+import shapely as shply
 from pprint import pprint
+from shapely.geometry import Polygon, LineString
+from shapely.prepared import prep
 
 ox.config(log_console=True, use_cache=True)
 
@@ -73,7 +76,8 @@ class OSMManipulator:
 
     @staticmethod
     def plot_graph(G):
-        ox.plot_graph(G, save=True, file_format='svg', filename=f'{OSM_OUTPUT_DIR}/network_plot')
+        ox.plot_graph(G, save=True, file_format='svg', filename=f'{OSM_OUTPUT_DIR}/network_plot', edge_linewidth=0.2,
+                      node_size=2)
 
     @staticmethod
     def save_graph(G):
@@ -104,7 +108,7 @@ class OSMManipulator:
     def add_osm_node(self, G, node_id, coords):
         G.add_node(node_id, osmid=node_id, x=coords[0], y=coords[1])
 
-    def add_osm_edge(self, G, from_id, to_id):
+    def add_osm_edge(self, G, from_node, to_node):
         G.add_edge(from_id, to_id,
                    highway='pedestrian',
                    lanes='1',
@@ -130,7 +134,7 @@ class OSMManipulator:
         self.current_node_id += 1
         for coord in walkables:
             self.add_osm_node(G, self.current_node_id, coord)
-            self.add_osm_edge(G, nodes[-1]['node_id'], self.current_node_id)
+            self.add_osm_edge(G, nodes[-1]['node_id'], self.current_node_id, nodes[-1]['coord'])
             nodes.append({'node_id': self.current_node_id, 'coord': coord})
             self.current_node_id += 1
         self.add_osm_edge(G, nodes[-1]['node_id'], nodes[0]['node_id'])
@@ -191,6 +195,7 @@ class OSMManipulator:
         entry_points = self.get_entry_points(geojson)
         entry_points_map = self.get_connection_points(entry_points)
         open_space_nodes = self.add_open_space_to_graph(G, open_space)
+        self.get_visiblity_graph_edges(open_space_nodes)
         self.add_entry_point_connection(G, entry_points_map)
 
     def test_open_space(self):
@@ -200,6 +205,34 @@ class OSMManipulator:
         print(G)
         self.insert_open_space(G)
         self.gh_docker_controller.clean_graphhopper_restart()
+
+    def get_all_nodes(self, open_space):
+        nodes = []
+        for elem in open_space['walkables']:
+            nodes.extend(elem)
+        for elem in open_space['restricted']:
+            nodes.extend(elem)
+        return nodes
+
+    def get_visiblity_graph_edges(self, open_space):
+        added_edges = 0
+        open_space_polygon_arr = [[elem['coord'][0], elem['coord'][1]] for elem in open_space['walkables'][0]]
+        open_space_poly = Polygon(open_space_polygon_arr)
+        prep_open_space_poly = prep(open_space_poly)
+        prep_not_walkable_poly = prep(
+            Polygon([[elem['coord'][0], elem['coord'][1]] for elem in open_space['restricted'][0]]))
+        nodes = self.get_all_nodes(open_space)
+
+        for open_space_elem_from in nodes:
+            for open_space_elem_to in nodes:
+                if open_space_elem_from['node_id'] < open_space_elem_to['node_id']:
+                    new_possible_edge = LineString([open_space_elem_from['coord'], open_space_elem_to['coord']])
+                    if prep_open_space_poly.covers(new_possible_edge) and (not prep_not_walkable_poly.intersects(
+                            new_possible_edge) or prep_not_walkable_poly.touches(new_possible_edge)):
+                        added_edges += 1
+                        self.add_osm_edge(G, open_space_elem_from['node_id'], open_space_elem_to['node_id'])
+
+        print(f'ADDED_EDGES:\t{added_edges}')
 
 
 if __name__ == '__main__':
