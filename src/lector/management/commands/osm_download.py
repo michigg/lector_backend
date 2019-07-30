@@ -1,5 +1,10 @@
 from django.core.management.base import BaseCommand
+from lector.utils.docker_controller import DockerGraphhopperController
 from lector.utils.osmm import OSMManipulator
+
+SERVICE_NAME = 'graphhopper'
+OSM_OUTPUT_DIR = '/osm_data'
+OSM_OUTPUT_FILENAME = 'data'
 
 
 class Command(BaseCommand):
@@ -12,3 +17,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         osmm = OSMManipulator()
         osmm.insert_open_spaces()
+        osmm.plot_graph()
+        osmm.save_graph()
+
+        gh_docker_controller = DockerGraphhopperController(graphhopper_service_name=SERVICE_NAME,
+                                                           osm_output_dir=OSM_OUTPUT_DIR,
+                                                           osm_output_filename=OSM_OUTPUT_FILENAME)
+        gh_docker_controller.clean_graphhopper_restart()

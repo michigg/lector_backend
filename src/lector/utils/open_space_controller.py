@@ -1,6 +1,7 @@
 import osmnx as ox
 from shapely.geometry import Polygon, LineString
 from shapely.prepared import prep
+from pprint import pprint
 
 
 class OpenSpaceController:
@@ -62,21 +63,42 @@ class OpenSpaceController:
             print(dist)
             self.add_osm_edge(node_id, point_obj['street_node_id'])
 
+    def is_visible_edge(self, open_space, line):
+        touch_bools = []
+        for restriced_area in open_space['restricted']:
+            prep_not_walkable_poly = prep(Polygon([[elem['coord'][0], elem['coord'][1]] for elem in restriced_area]))
+            restriced_areas_without_current = open_space['restricted'].copy().remove(restriced_area)
+            expression_not_intersect = not prep_not_walkable_poly.intersects(line)
+            expression_touches = prep_not_walkable_poly.touches(line)
+            if restriced_areas_without_current:
+                # TODO: simplify
+                expression_not_intersect_other = all(
+                    [not self.get_prep_poly(restriced_area_intersectable).intersects(line) for
+                     restriced_area_intersectable
+                     in restriced_areas_without_current])
+            else:
+                expression_not_intersect_other = True
+            expression = (expression_not_intersect or expression_touches) and expression_not_intersect_other
+            touch_bools.append(expression)
+        return all(touch_bools)
+
+    def get_prep_poly(self, restriced_area_intersectable):
+        return prep(Polygon([elem['coord']
+                             for elem in restriced_area_intersectable]))
+
     def add_visiblity_graph_edges(self, open_space):
         added_edges = 0
         open_space_polygon_arr = [[elem['coord'][0], elem['coord'][1]] for elem in open_space['walkables'][0]]
         open_space_poly = Polygon(open_space_polygon_arr)
         prep_open_space_poly = prep(open_space_poly)
-        prep_not_walkable_poly = prep(
-            Polygon([[elem['coord'][0], elem['coord'][1]] for elem in open_space['restricted'][0]]))
         nodes = self.get_all_nodes(open_space)
 
         for open_space_elem_from in nodes:
             for open_space_elem_to in nodes:
                 if open_space_elem_from['node_id'] < open_space_elem_to['node_id']:
                     new_possible_edge = LineString([open_space_elem_from['coord'], open_space_elem_to['coord']])
-                    if prep_open_space_poly.covers(new_possible_edge) and (not prep_not_walkable_poly.intersects(
-                            new_possible_edge) or prep_not_walkable_poly.touches(new_possible_edge)):
+                    if prep_open_space_poly.covers(new_possible_edge) and self.is_visible_edge(open_space,
+                                                                                               new_possible_edge):
                         added_edges += 1
                         self.add_osm_edge(open_space_elem_from['node_id'], open_space_elem_to['node_id'])
 
