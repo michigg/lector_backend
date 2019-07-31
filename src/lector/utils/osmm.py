@@ -1,9 +1,12 @@
+import logging
+
 import osmnx as ox
-
 from lector.utils.open_space_config_controller import OpenSpaceConfigController
-from lector.utils.open_space_controller import OpenSpaceController
+from lector.utils.open_space_controller import OpenSpace, GraphOpenSpace
 
-ox.config(log_console=True, use_cache=True)
+logger = logging.getLogger(__name__)
+
+ox.config(log_console=False, use_cache=True)
 
 BAMBERG_BBOX = [49.865874134216426, 49.925145775384436, 10.836982727050781, 10.951995849609375]
 # BAMBERG_BBOX = [49.9954, 49.7511, 10.7515, 11.1909]
@@ -18,19 +21,29 @@ class OSMManipulator:
     def __init__(self):
         self.osp_config_c = OpenSpaceConfigController(OPEN_SPACE_CONFIG_DIR)
         self.graph = self.download_map()
-        self.osp_c = OpenSpaceController(self.graph)
+        self.current_node_id = 0
 
     def insert_open_spaces(self):
         open_spaces = self.osp_config_c.get_open_spaces()
         for open_space in open_spaces:
-            print('NEW OPEN SPACE --------------------------------------------------------')
-            self.osp_c.insert_open_space(open_space)
+            self.insert_open_space(open_space)
+
+    def insert_open_space(self, open_space: OpenSpace):
+        logger.info(f'Insert Open Space')
+        logger.info(f'Graph Nodes: {len(self.graph)}')
+        graph_open_space = GraphOpenSpace(open_space, self.graph, self.current_node_id)
+        graph_open_space.add_visiblity_graph_edges()
+        graph_open_space.add_entry_edges()
+        # graph_open_space.add_walkable_edges()
+        # graph_open_space.add_restricted_area_edges()
+        self.current_node_id = graph_open_space.current_osm_id
+        logger.info(f'Graph Nodes: {len(self.graph)}')
 
     @staticmethod
     def download_map():
         return ox.graph_from_address('Markusplatz, Bamberg, Oberfranken, Bayern, 96047, Deutschland',
                                      network_type='all',
-                                     distance=300)
+                                     distance=365)
 
     @staticmethod
     def load_map():
@@ -41,9 +54,10 @@ class OSMManipulator:
                       save=True,
                       file_format='svg',
                       filename=f'{OSM_OUTPUT_DIR}/network_plot',
-                      edge_linewidth=0.2,
-                      node_size=2)
+                      edge_linewidth=0.05,
+                      node_size=0.5)
 
     def save_graph(self):
         ox.save_graph_osm(self.graph, filename=f'{OSM_OUTPUT_FILENAME}.osm',
                           folder=OSM_OUTPUT_DIR)
+        logger.info(f'Saved osm xml to {OSM_OUTPUT_DIR}/{OSM_OUTPUT_FILENAME}.osm')

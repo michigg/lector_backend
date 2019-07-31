@@ -1,12 +1,21 @@
 import json
 import os
+import logging
+from typing import List
+
+from lector.utils.open_space_controller import OpenSpace, EntryPoint
+
+logger = logging.getLogger(__name__)
 
 
 class OpenSpaceConfigController:
     def __init__(self, config_dir='/open_spaces'):
         self.config_dir = config_dir
+        self.open_spaces = self._load_open_spaces()
+        logger.info(f'LOADED OPEN SPACES {len(self.open_spaces)}')
 
     def _load_geojson(self, file='markusplatz.geojson'):
+        logger.info(f'LOAD geojson of file {self.config_dir}/{file}')
         with open(f'{self.config_dir}/{file}') as f:
             return json.load(f)
 
@@ -15,10 +24,10 @@ class OpenSpaceConfigController:
 
     def _get_geojsons(self):
         files = self._get_geojson_files()
-        print(f'FOUND FILES:\t{files}')
+        logger.info(f'FOUND {len(files)} geojsons')
         return [self._load_geojson(file) for file in files]
 
-    def get_open_space(self, geojson):
+    def _get_open_space(self, geojson) -> OpenSpace:
         walkables = []
         restricted = []
         entry_points = []
@@ -29,8 +38,17 @@ class OpenSpaceConfigController:
                 else:
                     restricted.append(feature['geometry']['coordinates'][0])
             if "entry" in feature['properties'] and feature['properties']['entry'] == "True":
-                entry_points.append(feature['geometry']['coordinates'])
-        return {'walkables': walkables, 'restricted': restricted, 'entry_points': entry_points}
+                entry_points.append(EntryPoint(feature['geometry']['coordinates']))
+        if len(walkables) > 1:
+            logger.warn(f'Multiple walkable areas detected. Only one walkable area for each config file is allowed!')
+        if len(walkables) == 0:
+            logger.error(f'No walkable area found! Area dismissed!')
+            return OpenSpace()
+        else:
+            return OpenSpace(walkables[0], restricted, entry_points)
 
-    def get_open_spaces(self):
-        return [self.get_open_space(geojson) for geojson in self._get_geojsons()]
+    def _load_open_spaces(self):
+        return [self._get_open_space(geojson) for geojson in self._get_geojsons()]
+
+    def get_open_spaces(self) -> List[OpenSpace]:
+        return self.open_spaces
