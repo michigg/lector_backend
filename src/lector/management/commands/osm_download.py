@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from lector.utils.docker_controller import DockerGraphhopperController
 from lector.utils.osmm import OSMManipulator
+import logging
 
 SERVICE_NAME = 'graphhopper'
 OSM_OUTPUT_DIR = '/osm_data'
@@ -15,6 +16,8 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
+        logger = logging.getLogger('')
+        logger.setLevel(logging.INFO)
         osmm = OSMManipulator()
         osmm.insert_open_spaces()
         osmm.plot_graph()
@@ -24,3 +27,5 @@ class Command(BaseCommand):
                                                            osm_output_dir=OSM_OUTPUT_DIR,
                                                            osm_output_filename=OSM_OUTPUT_FILENAME)
         gh_docker_controller.clean_graphhopper_restart()
+
+        logger.setLevel(logging.WARNING)
