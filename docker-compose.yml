@@ -34,7 +34,10 @@ services:
       - docker/lector/dev.env
 
   graphhopper:
-    image: graphhopper/graphhopper:latest
+    image: graphhopper:willy
+    build:
+      context: ./docker/graphhopper/graphhopper
+      dockerfile: Dockerfile
     command: /data/data.osm
     volumes:
       - ./osm_data:/data
