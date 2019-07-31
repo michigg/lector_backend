@@ -3,7 +3,9 @@ from typing import List
 
 import osmnx as ox
 from networkx import DiGraph
-from shapely.geometry import Polygon, LineString
+from shapely.geometry import Polygon, LineString, Point
+from shapely.ops import nearest_points
+
 from shapely.prepared import prep
 
 logger = logging.getLogger(__name__)
@@ -14,6 +16,8 @@ class EntryPoint:
         self.open_space_coord = entry_point
         self.open_space_node_id = None
         self.nearest_graph_node_id = None
+        self.graph_entry_node_coord = None
+        self.graph_entry_edge = []
 
 
 class OpenSpace:
@@ -50,11 +54,16 @@ class GraphOpenSpace(OpenSpace):
                             oneway=True,
                             length=40)
 
+    def _set_nearest_point_to_entry(self, entry_point: EntryPoint) -> (Point, int, int):
+        nearest_edge = ox.get_nearest_edge(self.graph, entry_point.open_space_coord[::-1])
+        entry_point_shply = Point(*entry_point.open_space_coord)
+        nearest_point = nearest_points(entry_point_shply, nearest_edge[0])[1]
+        entry_point.graph_entry_node_coord = [nearest_point.x, nearest_point.y]
+        entry_point.graph_entry_edge = [nearest_edge[1], nearest_edge[2]]
+
     def _set_node_ids(self):
         for entry_point in self.entry_points:
-            # TODO
-            print(ox.get_nearest_edge(self.graph, entry_point.open_space_coord))
-            entry_point.nearest_graph_node_id = ox.get_nearest_node(self.graph, entry_point.open_space_coord[::-1])
+            self._set_nearest_point_to_entry(entry_point)
 
         for point in self.walkable_area:
             self.add_osm_node(point)
@@ -126,6 +135,10 @@ class GraphOpenSpace(OpenSpace):
 
     def add_entry_edges(self):
         for entry_point in self.entry_points:
+            self.add_osm_node(entry_point.graph_entry_node_coord)
+            entry_point.nearest_graph_node_id = self.current_osm_id
+            self.add_osm_edge(entry_point.graph_entry_edge[0], entry_point.nearest_graph_node_id)
+            self.add_osm_edge(entry_point.graph_entry_edge[1], entry_point.nearest_graph_node_id)
             self.add_osm_edge(entry_point.nearest_graph_node_id, entry_point.open_space_node_id)
 
     def add_walkable_edges(self):
