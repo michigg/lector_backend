@@ -62,12 +62,6 @@ class UnivISRoomController:
             persons.append(person)
         return persons
 
-    def parsePage(self, url):
-        page = self.loadPage(url)
-        data = xmltodict.parse(page)
-        rooms = self.get_rooms(data)
-        return rooms
-
     def get_rooms_by_building_key(self, building_key) -> List[Room]:
         data = self.loadPage(self._get_univis_api_url(building_key))
         return self.get_rooms(data, building_key)
