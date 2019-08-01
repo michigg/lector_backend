@@ -1,9 +1,11 @@
 import json
+import logging
 import os
 from typing import List
 
-from src.indoor_mapper.utils.building_models import Building, Floor, StairCase
-from src.indoor_mapper.utils.indoor_mapper import logger
+from indoor_mapper.utils.building_models import Building, Floor, StairCase
+
+logger = logging.getLogger(__name__)
 
 
 class IndoorMapperConfigController:

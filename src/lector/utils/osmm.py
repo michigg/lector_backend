@@ -21,7 +21,7 @@ class OSMManipulator:
     def __init__(self):
         self.osp_config_c = OpenSpaceConfigController(OPEN_SPACE_CONFIG_DIR)
         self.graph = self.download_map()
-        self.current_node_id = 0
+        self.current_osm_id = 0
         self.inserted_open_spaces = []
 
     def insert_open_spaces(self):
@@ -32,12 +32,12 @@ class OSMManipulator:
     def insert_open_space(self, open_space: OpenSpace):
         logger.info(f'Insert Open Space')
         logger.info(f'Graph Nodes: {len(self.graph)}')
-        graph_open_space = GraphOpenSpace(open_space, self.graph, self.current_node_id)
+        graph_open_space = GraphOpenSpace(open_space, self.graph, self.current_osm_id)
         graph_open_space.add_visiblity_graph_edges()
         graph_open_space.add_entry_edges()
         # graph_open_space.add_walkable_edges()
         # graph_open_space.add_restricted_area_edges()
-        self.current_node_id = graph_open_space.current_osm_id
+        self.current_osm_id = graph_open_space.current_osm_id
         self.inserted_open_spaces.append(graph_open_space)
         logger.info(f'Graph Nodes: {len(self.graph)}')
 
@@ -69,3 +69,19 @@ class OSMManipulator:
         ox.save_graph_osm(self.graph, filename=f'{OSM_OUTPUT_FILENAME}.osm',
                           folder=OSM_OUTPUT_DIR)
         logger.info(f'Saved osm xml to {OSM_OUTPUT_DIR}/{OSM_OUTPUT_FILENAME}.osm')
+
+    def add_osm_edge(self, from_id, to_id):
+        self.graph.add_edge(from_id, to_id,
+                            highway='pedestrian',
+                            lanes='1',
+                            name='Test',
+                            oneway=True,
+                            length=40)
+
+    def add_osm_node(self, coords):
+        node_id = self._get_new_node_id()
+        self.graph.add_node(node_id, osmid=node_id, x=coords[0], y=coords[1])
+
+    def _get_new_node_id(self) -> int:
+        self.current_osm_id += 1
+        return self.current_osm_id

@@ -1,6 +1,7 @@
 from typing import List
 
-from src.indoor_mapper.utils.univis_models import Room
+from indoor_mapper.utils.univis_models import Room
+from lector.utils.open_space_controller import EntryPoint
 
 
 class Floor:
