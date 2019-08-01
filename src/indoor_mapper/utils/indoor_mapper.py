@@ -1,6 +1,4 @@
-import json
 import logging
-import os
 from typing import List
 
 import osmnx as ox
@@ -12,7 +10,8 @@ from networkx import DiGraph
 from shapely.geometry import Point
 from shapely.ops import nearest_points
 
-from src.indoor_mapper.utils.building_models import Floor, StairCase, GraphStairCase, Building, GraphBuilding
+from src.indoor_mapper.utils.building_models import GraphStairCase, GraphBuilding
+from src.indoor_mapper.utils.config_controller import IndoorMapperConfigController
 from src.indoor_mapper.utils.univis_models import Room
 
 logger = logging.getLogger(__name__)
@@ -38,35 +37,6 @@ class GraphManipulator:
     def _get_new_node_id(self) -> int:
         self.current_osm_id += 1
         return self.current_osm_id
-
-
-class IndoorMapperConfigController:
-    def __init__(self, config_dir='/indoor_maps'):
-        self.config_dir = config_dir
-        self.buildings = self._get_buildings()
-        logger.info(f'LOADED BUILDINGS {len(self.buildings)}')
-
-    def _load_building_config(self, file='erba.json'):
-        logger.info(f'LOAD config of file {self.config_dir}/{file}')
-        with open(f'{self.config_dir}/{file}') as f:
-            return json.load(f)
-
-    def _get_build_config_files(self):
-        return [f for f in os.listdir(self.config_dir) if f.endswith('.json')]
-
-    def _get_buildings(self) -> List[Building]:
-        building_objs = []
-        for file in self._get_build_config_files():
-            building = self._load_building_config(file)
-            staircase_objs = []
-            for staircase in building['staircases']:
-                floor_objs = []
-                for floor in staircase['floors']:
-                    floor_objs.append(Floor(floor['level'], floor['room_range_min'], floor['room_range_max']))
-                staircase_objs.append(
-                    StairCase(staircase['name'], floor_objs, staircase['coord'], staircase['entries']))
-            building_objs.append(Building(building['building_id'], staircase_objs))
-        return building_objs
 
 
 class UnivISRoomController:
