@@ -3,7 +3,8 @@ import os
 import logging
 from typing import List
 
-from lector.utils.open_space_controller import OpenSpace, EntryPoint
+# from .open_space_controller import OpenSpace, EntryPoint
+from lector.utils.open_space_models import EntryPoint, OpenSpace
 
 logger = logging.getLogger(__name__)
 

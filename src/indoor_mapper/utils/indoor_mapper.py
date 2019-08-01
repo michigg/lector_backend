@@ -1,21 +1,17 @@
 import logging
 from typing import List
 
-import osmnx as ox
 from indoor_mapper.utils.building_models import GraphStairCase, GraphBuilding
 from indoor_mapper.utils.config_controller import IndoorMapperConfigController
 from indoor_mapper.utils.univis_room_controller import UnivISRoomController
-from lector.utils.open_space_controller import EntryPoint
+from lector.utils.open_space_models import EntryPoint
 from lector.utils.osmm import OSMManipulator
-from shapely.geometry import Point
-from shapely.ops import nearest_points
 
 logger = logging.getLogger(__name__)
 
 
-class IndoorMapController():
+class IndoorMapController:
     def __init__(self, osmm: OSMManipulator):
-        super().__init__(osmm.current_node_id, osmm.graph)
         self.univis_c = UnivISRoomController()
         self.indoor_cc = IndoorMapperConfigController()
         self.graph_buildings = None
@@ -56,16 +52,9 @@ class IndoorMapController():
         for building in self.indoor_maps_to_graph():
             for staircase in building.graph_staircases:
                 for entry_point in staircase.entry_points:
-                    self._set_nearest_point_to_entry(entry_point)
+                    self.osmm.set_nearest_point_to_entry(entry_point)
                 self.add_entry_edges(staircase.entry_points)
                 self.add_staircase_edges(staircase)
-
-    def _set_nearest_point_to_entry(self, entry_point: EntryPoint) -> (Point, int, int):
-        nearest_edge = ox.get_nearest_edge(self.graph, entry_point.open_space_coord[::-1])
-        entry_point_shply = Point(*entry_point.open_space_coord)
-        nearest_point = nearest_points(entry_point_shply, nearest_edge[0])[1]
-        entry_point.graph_entry_node_coord = [nearest_point.x, nearest_point.y]
-        entry_point.graph_entry_edge = [nearest_edge[1], nearest_edge[2]]
 
     def add_entry_edges(self, entry_points):
         edges = len(self.graph.edges)

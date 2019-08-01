@@ -21,12 +21,13 @@ class Command(BaseCommand):
         logger = logging.getLogger('')
         logger.setLevel(logging.INFO)
         osmm = OSMManipulator()
-        osmm.insert_open_spaces()
+        osmm.add_open_spaces()
+        osmm.add_indoor_maps()
 
-        indoor_map_c = IndoorMapController(osmm)
-        indoor_map_c.load_indoor_map_data()
-        indoor_map_c.indoor_maps_to_graph()
-        indoor_map_c.add_staircase_to_graph()
+        # indoor_map_c = IndoorMapController(osmm)
+        # indoor_map_c.load_indoor_map_data()
+        # indoor_map_c.indoor_maps_to_graph()
+        # indoor_map_c.add_staircase_to_graph()
 
         osmm.plot_graph()
         osmm.save_graph()
