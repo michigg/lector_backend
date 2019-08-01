@@ -28,7 +28,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'lector'
+    'indoor_mapper',
+    'lector',
 ]
 
 MIDDLEWARE = [
