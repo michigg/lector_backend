@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 ox.config(log_console=False, use_cache=True)
 
-BAMBERG_BBOX = [49.865874134216426, 49.925145775384436, 10.836982727050781, 10.951995849609375]
+BAMBERG_BBOX = [49.925145775384436, 49.865874134216426, 10.951995849609375, 10.836982727050781]
 # BAMBERG_BBOX = [49.9954, 49.7511, 10.7515, 11.1909]
 
 OSM_OUTPUT_FILENAME = "data"
@@ -41,9 +41,10 @@ class OSMManipulator:
 
     @staticmethod
     def download_map():
-        return ox.graph_from_address('Markusplatz, Bamberg, Oberfranken, Bayern, 96047, Deutschland',
-                                     network_type='all',
-                                     distance=500)
+        # return ox.graph_from_address('Markusplatz, Bamberg, Oberfranken, Bayern, 96047, Deutschland',
+        #                              network_type='all',
+        #                              distance=500)
+        return ox.graph_from_bbox(*BAMBERG_BBOX)
 
     @staticmethod
     def load_map():
