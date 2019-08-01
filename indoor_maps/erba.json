@@ -1,0 +1,75 @@
+{
+  "building_id": "WE5",
+  "staircases": [
+    {
+      "name": "Treppenhaus Seminarturm",
+      "floors": [
+        {
+          "level": 0,
+          "room_range_min": 0,
+          "room_range_max": 18
+        },
+        {
+          "level": 1,
+          "room_range_min": 0,
+          "room_range_max": 18
+        },
+        {
+          "level": 2,
+          "room_range_min": 0,
+          "room_range_max": 18
+        },
+        {
+          "level": 3,
+          "room_range_min": 0,
+          "room_range_max": 18
+        },
+        {
+          "level": 4,
+          "room_range_min": 0,
+          "room_range_max": 18
+        },
+        {
+          "level": 5,
+          "room_range_min": 0,
+          "room_range_max": 18
+        }
+      ]
+    },
+    {
+      "name": "Treppenhaus Hauptgebäude",
+      "floors": [
+        {
+          "level": 0,
+          "room_range_min": 19,
+          "room_range_max": 132
+        },
+        {
+          "level": 1,
+          "room_range_min": 19,
+          "room_range_max": 132
+        },
+        {
+          "level": 2,
+          "room_range_min": 19,
+          "room_range_max": 132
+        },
+        {
+          "level": 3,
+          "room_range_min": 19,
+          "room_range_max": 132
+        },
+        {
+          "level": 4,
+          "room_range_min": 19,
+          "room_range_max": 132
+        },
+        {
+          "level": 5,
+          "room_range_min": 19,
+          "room_range_max": 132
+        }
+      ]
+    }
+  ]
+}
