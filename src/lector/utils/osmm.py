@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 ox.config(log_console=False, use_cache=True)
 
-BAMBERG_BBOX = [49.865874134216426, 49.925145775384436, 10.836982727050781, 10.951995849609375]
+BAMBERG_BBOX = [49.925145775384436, 49.865874134216426, 10.951995849609375, 10.836982727050781]
 # BAMBERG_BBOX = [49.9954, 49.7511, 10.7515, 11.1909]
 
 OSM_OUTPUT_FILENAME = "data"
@@ -22,6 +22,7 @@ class OSMManipulator:
         self.osp_config_c = OpenSpaceConfigController(OPEN_SPACE_CONFIG_DIR)
         self.graph = self.download_map()
         self.current_node_id = 0
+        self.inserted_open_spaces = []
 
     def insert_open_spaces(self):
         open_spaces = self.osp_config_c.get_open_spaces()
@@ -37,13 +38,15 @@ class OSMManipulator:
         # graph_open_space.add_walkable_edges()
         # graph_open_space.add_restricted_area_edges()
         self.current_node_id = graph_open_space.current_osm_id
+        self.inserted_open_spaces.append(graph_open_space)
         logger.info(f'Graph Nodes: {len(self.graph)}')
 
     @staticmethod
     def download_map():
         return ox.graph_from_address('Markusplatz, Bamberg, Oberfranken, Bayern, 96047, Deutschland',
                                      network_type='all',
-                                     distance=500)
+                                     distance=1200)
+        # return ox.graph_from_bbox(*BAMBERG_BBOX)
 
     @staticmethod
     def load_map():
