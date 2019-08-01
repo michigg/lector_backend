@@ -8,3 +8,4 @@ numpy==1.16.4
 gdal==2.4.0
 osmnx==0.10
 docker==4.0.2
+xmltodict==0.12.0
