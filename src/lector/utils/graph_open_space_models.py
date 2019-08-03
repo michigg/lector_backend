@@ -5,16 +5,16 @@ from shapely.geometry import Polygon, LineString
 from shapely.prepared import prep
 
 from lector.utils.open_space_models import OpenSpace, logger
-from lector.utils.osmm import OSMManipulator
+
+
+# from lector.utils.osmm import OSMManipulator
 
 
 class GraphOpenSpace(OpenSpace):
-    def __init__(self, open_space: OpenSpace, osmm: OSMManipulator):
+    def __init__(self, open_space: OpenSpace, osmm):
         super().__init__(walkable_area=open_space.walkable_area, restricted_areas=open_space.restricted_areas,
                          entry_points=open_space.entry_points)
         self.osmm = osmm
-        self.graph = osmm.graph
-        self.current_osm_id = osmm.current_osm_id
         self.walkable_area_poly = Polygon(open_space.walkable_area)
         self.walkable_area_prep_poly = prep(self.walkable_area_poly)
         self.walkable_area_nodes = []
@@ -30,16 +30,16 @@ class GraphOpenSpace(OpenSpace):
 
         for point in self.walkable_area:
             self.osmm.add_osm_node(point)
-            self.walkable_area_nodes.append(self.current_osm_id)
+            self.walkable_area_nodes.append(self.osmm.current_osm_id)
 
         for entry_point in self.entry_points:
-            entry_point.open_space_node_id = ox.get_nearest_node(self.graph, entry_point.open_space_coord[::-1])
+            entry_point.open_space_node_id = ox.get_nearest_node(self.osmm.graph, entry_point.open_space_coord[::-1])
 
         for restricted_area in self.restricted_areas:
             nodes = []
             for point in restricted_area:
                 self.osmm.add_osm_node(point)
-                nodes.append(self.current_osm_id)
+                nodes.append(self.osmm.current_osm_id)
             self.restricted_areas_nodes.append(nodes)
 
     def get_other_restricted_area_polys(self, restricted_area_poly: Polygon) -> List[Polygon]:
@@ -86,19 +86,11 @@ class GraphOpenSpace(OpenSpace):
             for node_to in nodes:
                 if node_from < node_to:
                     new_possible_edge = LineString(
-                        [self._get_coord_from_id(node_from), self._get_coord_from_id(node_to)])
+                        [self.osmm.get_coord_from_id(node_from), self.osmm.get_coord_from_id(node_to)])
                     if self.is_internal_edge(new_possible_edge) and self.is_visible_edge(new_possible_edge):
                         self.add_edge(node_from, node_to)
 
         logger.info(f'ADDED_EDGES:\t{len(self.edges) - curr_edges}')
-
-    def add_entry_edges(self):
-        for entry_point in self.entry_points:
-            self.osmm.add_osm_node(entry_point.graph_entry_node_coord)
-            entry_point.nearest_graph_node_id = self.current_osm_id
-            self.osmm.add_osm_edge(entry_point.graph_entry_edge[0], entry_point.nearest_graph_node_id)
-            self.osmm.add_osm_edge(entry_point.graph_entry_edge[1], entry_point.nearest_graph_node_id)
-            self.osmm.add_osm_edge(entry_point.nearest_graph_node_id, entry_point.open_space_node_id)
 
     def add_walkable_edges(self):
         self._set_polygon_edges(self.walkable_area_nodes)
@@ -114,6 +106,3 @@ class GraphOpenSpace(OpenSpace):
                 self.osmm.add_osm_edge(last_node, node)
             last_node = node
         self.osmm.add_osm_edge(self.walkable_area_nodes[0], self.walkable_area_nodes[-1])
-
-    def _get_coord_from_id(self, node_id):
-        return [self.graph.node[node_id]['x'], self.graph.node[node_id]['y']]

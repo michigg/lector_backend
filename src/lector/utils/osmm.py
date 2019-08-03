@@ -23,10 +23,10 @@ SERVICE_NAME = 'graphhopper'
 
 class OSMManipulator:
     def __init__(self):
-        self.osp_c = OpenSpaceController(self)
-        self.indoor_map_c = IndoorMapController(self)
         self.graph = self.download_map()
         self.current_osm_id = 0
+        self.osp_c = OpenSpaceController(self)
+        self.indoor_map_c = IndoorMapController(self)
 
     def add_open_spaces(self):
         self.osp_c.insert_open_spaces()
@@ -87,3 +87,17 @@ class OSMManipulator:
         nearest_point = nearest_points(entry_point_shply, nearest_edge[0])[1]
         entry_point.graph_entry_node_coord = [nearest_point.x, nearest_point.y]
         entry_point.graph_entry_edge = [nearest_edge[1], nearest_edge[2]]
+
+    def get_coord_from_id(self, node_id):
+        node = self.graph.node[node_id]
+        return [node['x'], node['y']]
+
+    def add_entry_edges(self, entry_points):
+        edges = len(self.graph.edges)
+        for entry_point in entry_points:
+            self.add_osm_node(entry_point.graph_entry_node_coord)
+            entry_point.nearest_graph_node_id = self.current_osm_id
+            self.add_osm_edge(entry_point.graph_entry_edge[0], entry_point.nearest_graph_node_id)
+            self.add_osm_edge(entry_point.graph_entry_edge[1], entry_point.nearest_graph_node_id)
+            self.add_osm_edge(entry_point.nearest_graph_node_id, entry_point.open_space_node_id)
+        print(f'ADDED EDGES ENTRY: {len(self.graph.edges) - edges}')
