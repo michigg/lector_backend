@@ -1,7 +1,7 @@
 import logging
 
 from django.core.management.base import BaseCommand
-from indoor_mapper.utils.indoor_mapper import IndoorMapController
+
 from lector.utils.docker_controller import DockerGraphhopperController
 from lector.utils.osmm import OSMManipulator
 
@@ -23,12 +23,6 @@ class Command(BaseCommand):
         osmm = OSMManipulator()
         osmm.add_open_spaces()
         osmm.add_indoor_maps()
-
-        # indoor_map_c = IndoorMapController(osmm)
-        # indoor_map_c.load_indoor_map_data()
-        # indoor_map_c.indoor_maps_to_graph()
-        # indoor_map_c.add_staircase_to_graph()
-
         osmm.plot_graph()
         osmm.save_graph()
 

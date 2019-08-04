@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'indoor_mapper',
+    'lecture_room_service',
     'lector',
 ]
 

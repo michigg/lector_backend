@@ -6,8 +6,7 @@ from shapely.ops import nearest_points
 
 from indoor_mapper.utils.indoor_mapper import IndoorMapController
 from lector.utils.open_space_controller import OpenSpaceController
-from lector.utils.graph_open_space_models import GraphOpenSpace
-from lector.utils.open_space_models import EntryPoint, OpenSpace
+from lector.utils.open_space_models import EntryPoint
 
 logger = logging.getLogger(__name__)
 
