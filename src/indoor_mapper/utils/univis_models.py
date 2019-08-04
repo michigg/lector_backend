@@ -1,3 +1,10 @@
+class MinimalRoom:
+    def __init__(self, building_key, level, number):
+        self.building_key = building_key
+        self.number = number
+        self.level = level
+
+
 class Room:
     def __init__(self, univis_room):
         self.building_key = None

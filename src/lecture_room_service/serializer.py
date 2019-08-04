@@ -6,6 +6,11 @@ from rest_framework.fields import Field
 logger = logging.getLogger(__name__)
 
 
+class LonLatSerializer(serializers.Serializer):
+    longitude = serializers.FloatField(read_only=True)
+    latitude = serializers.FloatField(read_only=True)
+
+
 class LectureTypeField(Field):
     def to_representation(self, value):
         return {'id': value.name, 'value': value.value}

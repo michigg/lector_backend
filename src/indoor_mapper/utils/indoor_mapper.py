@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from indoor_mapper.utils.building_models import GraphStairCase, GraphBuilding
+from indoor_mapper.utils.building_models import GraphStairCase, GraphBuilding, StairCase
 from indoor_mapper.utils.config_controller import IndoorMapperConfigController
 from indoor_mapper.utils.univis_room_controller import UnivISRoomController
 from lector.utils.open_space_models import EntryPoint
@@ -62,6 +62,25 @@ class IndoorMapController:
         for entry in staircase.entry_points:
             self.osmm.add_osm_edge(staircase.position_id, entry.open_space_node_id)
         print(f'ADDED EDGES STAIRCASE: {len(self.graph.edges) - edges}')
+
+    def print_buildings(self):
+        for building in self.indoor_cc.buildings:
+            print(building)
+
+
+class RoomStaircaseController:
+    def __init__(self):
+        self.indoor_cc = IndoorMapperConfigController()
+
+    def get_rooms_staircase(self, room) -> StairCase or None:
+        for building in self.indoor_cc.buildings:
+            if building.key == room.building_key:
+                logger.warn('STAIRCASE')
+                for staircase in building.staircases:
+                    for level in staircase.floors:
+                        if int(level.level) == int(room.level) and level.room_range_min <= int(room.number) <= level.room_range_max:
+                            return staircase
+        return None
 
     def print_buildings(self):
         for building in self.indoor_cc.buildings:

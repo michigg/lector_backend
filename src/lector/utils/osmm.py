@@ -37,15 +37,13 @@ class OSMManipulator:
 
     @staticmethod
     def download_map():
-        return ox.graph_from_address('Markusplatz, Bamberg, Oberfranken, Bayern, 96047, Deutschland',
-                                     network_type='all',
-                                     distance=1200)
+        # return ox.graph_from_address('Markusplatz, Bamberg, Oberfranken, Bayern, 96047, Deutschland',
+        #                              network_type='all',
+        #                              distance=1200)
         # return ox.graph_from_address('Markusplatz, Bamberg, Oberfranken, Bayern, 96047, Deutschland',
         #                              network_type='all',
         #                              distance=500)
-        # return ox.graph_from_bbox(*BAMBERG_BBOX)
-
-        # return ox.graph_from_bbox(*BAMBERG_BBOX)
+        return ox.graph_from_bbox(*BAMBERG_BBOX)
 
     @staticmethod
     def load_map():
