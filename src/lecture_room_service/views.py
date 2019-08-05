@@ -1,4 +1,7 @@
 # Create your views here.
+from datetime import datetime
+
+from django.utils import timezone
 from rest_framework import views, status
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import AllowAny
@@ -21,6 +24,20 @@ class ApiLectures(views.APIView):
         if search_token:
             univis_lecture_c = UnivISLectureController()
             lectures = univis_lecture_c.get_lectures_by_token(search_token)
+            lectures = sorted(lectures, key=lambda lecture: lecture.get_first_term().starttime)
+            lectures_before = []
+            lectures_after = []
+            current_time = timezone.localtime(timezone.now())
+            for lecture in lectures:
+                logger.warn(current_time.time())
+                logger.warn(lecture.get_last_term().starttime.time())
+                logger.warn(lecture.get_last_term().starttime.time() < current_time.time())
+                if lecture.get_last_term().starttime.time() < current_time.time():
+                    lectures_before.append(lecture)
+                else:
+                    lectures_after.append(lecture)
+            lectures = lectures_after
+            lectures.extend(lectures_before)
             lectures_dicts = []
             for lecture in lectures:
                 lectures_dicts.append(lecture.__dict__)
@@ -39,7 +56,6 @@ class ApiRoomCoord(views.APIView):
         if building and level and number:
             room_staircase_c = RoomStaircaseController()
             staircase = room_staircase_c.get_rooms_staircase(MinimalRoom(building, level, number))
-            logger.warn(staircase)
             if staircase:
                 result = LonLatSerializer({'longitude': staircase.coord[0], 'latitude': staircase.coord[1]},
                                           many=False).data

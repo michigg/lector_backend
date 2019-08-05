@@ -28,6 +28,10 @@ RUN echo "**** compile spatialindex ****" && \
     cmake . -DCMAKE_INSTALL_PREFIX=/usr && \
     make && \
     make install
+RUN apk add tzdata && \
+    cp /usr/share/zoneinfo/Europe/Berlin /etc/localtime && \
+    echo "Europe/Berlin" >  /etc/timezone && \
+    apk del tzdata
 
 WORKDIR /lector
 

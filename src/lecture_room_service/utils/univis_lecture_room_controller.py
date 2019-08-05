@@ -55,15 +55,18 @@ class UnivISLectureController:
         lectures = self.get_lectures(data, rooms)
         lecture_map = self.get_univis_key_dict(lectures)
         person_map = self.get_univis_key_dict(persons)
+        clean_lectures = []
         for lecture in lectures:
-            if lecture.parent_lecture__ref:
-                lecture.parent_lecture = lecture_map[lecture.parent_lecture__ref]
-            new_lecturers = []
-            for lecturer in lecture.lecturers:
-                new_lecturers.append(person_map[lecturer.univis_key])
-            lecture.lecturers = new_lecturers
+            if len(lecture.terms) > 0:
+                if lecture.parent_lecture__ref:
+                    lecture.parent_lecture = lecture_map[lecture.parent_lecture__ref]
+                new_lecturers = []
+                for lecturer in lecture.lecturers:
+                    new_lecturers.append(person_map[lecturer.univis_key])
+                lecture.lecturers = new_lecturers
+                clean_lectures.append(lecture)
 
-        for lecture in lectures:
+        for lecture in clean_lectures:
             print(lecture)
-        print(f'FOUND LECTURES {len(lectures)}')
-        return lectures
+        print(f'FOUND LECTURES {len(clean_lectures)}')
+        return clean_lectures

@@ -50,6 +50,14 @@ class LectureType(Enum):
     PROJECT = "Project"
 
 
+class LectureTerm:
+    def __init__(self, univis_term: dict, rooms: List[Room]):
+        self.starttime = timezone.datetime.strptime(univis_term.get('starttime'), '%H:%M')
+        self.endtime = timezone.datetime.strptime(univis_term.get('endtime'), '%H:%M')
+        self.repeat = univis_term.get('repeat')
+        self.room = list(filter(lambda x: x.univis_key == dict(univis_term['room']['UnivISRef']).get('@key'), rooms))[0]
+
+
 class Lecture:
     def __init__(self, univis_lecture: dict, rooms: List[Room]):
         print(univis_lecture)
@@ -91,6 +99,18 @@ class Lecture:
                  'PROJ': LectureType.PROJECT}
         return types[univis_type]
 
+    def get_first_term(self) -> List[LectureTerm] or None:
+        sorted_terms = sorted(self.terms, key=lambda x: x.starttime)
+        if len(sorted_terms) > 0:
+            return sorted_terms[0]
+        return None
+
+    def get_last_term(self) -> List[LectureTerm] or None:
+        sorted_terms = sorted(self.terms, key=lambda x: x.starttime)
+        if len(sorted_terms) > 0:
+            return sorted_terms[-1]
+        return None
+
     def get_rooms(self):
         rooms = []
         for term in self.terms:
@@ -102,14 +122,6 @@ class Lecture:
             return f'Lecture {self.name}:\n\tUnivIS Key: {self.univis_key}\n\tType: {self.type}\n\tOrgname: {self.orgname}\n\tParent Lecture: {self.parent_lecture.name}\n\tROOMS: {self.get_rooms()}'
         else:
             return f'Lecture {self.name}:\n\tUnivIS Key: {self.univis_key}\n\tType: {self.type}\n\tOrgname: {self.orgname}\n\tParent Lecture Ref: {self.parent_lecture__ref}\n\tROOMS: {self.get_rooms()}'
-
-
-class LectureTerm:
-    def __init__(self, univis_term: dict, rooms: List[Room]):
-        self.starttime = timezone.datetime.strptime(univis_term.get('starttime'), '%H:%M')
-        self.endtime = timezone.datetime.strptime(univis_term.get('endtime'), '%H:%M')
-        self.repeat = univis_term.get('repeat')
-        self.room = list(filter(lambda x: x.univis_key == dict(univis_term['room']['UnivISRef']).get('@key'), rooms))[0]
 
 
 class Person:
