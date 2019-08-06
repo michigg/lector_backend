@@ -1,0 +1,27 @@
+{
+  "building_id": "MND",
+  "staircases": [
+    {
+      "name": "Haupteingang",
+      "coord": [
+        10.883540511131287,
+        49.895418840673656
+      ],
+      "entries": [
+        {
+          "wheelchair": true,
+          "coord": [
+            10.883567333221436,
+            49.89542575202613
+          ]
+        }
+      ],
+      "floors": [
+        {
+          "level": 0,
+          "ranges": [[0, 999]]
+        }
+      ]
+    }
+  ]
+}
