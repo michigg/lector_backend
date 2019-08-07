@@ -37,13 +37,13 @@ class OSMManipulator:
 
     @staticmethod
     def download_map():
-        # return ox.graph_from_address('Markusplatz, Bamberg, Oberfranken, Bayern, 96047, Deutschland',
-        #                              network_type='all',
-        #                              distance=1200)
+        return ox.graph_from_address('Markusplatz, Bamberg, Oberfranken, Bayern, 96047, Deutschland',
+                                     network_type='all',
+                                     distance=1200, simplify=False)
         # return ox.graph_from_address('Markusplatz, Bamberg, Oberfranken, Bayern, 96047, Deutschland',
         #                              network_type='all',
         #                              distance=500)
-        return ox.graph_from_bbox(*BAMBERG_BBOX)
+        # return ox.graph_from_bbox(*BAMBERG_BBOX, simplify=False)
 
     @staticmethod
     def load_map():
@@ -54,21 +54,27 @@ class OSMManipulator:
                       save=True,
                       file_format='svg',
                       filename=f'{OSM_OUTPUT_DIR}/network_plot',
-                      edge_linewidth=0.05,
-                      node_size=0.5)
+                      edge_linewidth=0.025,
+                      node_size=0.1)
 
     def save_graph(self):
-        ox.save_graph_osm(self.graph, filename=f'{OSM_OUTPUT_FILENAME}.osm',
-                          folder=OSM_OUTPUT_DIR)
+        ox.save_graph_osm(self.graph,
+                          filename=f'{OSM_OUTPUT_FILENAME}.osm',
+                          folder=OSM_OUTPUT_DIR,
+                          # oneway=False,
+                          node_tags=['highway'],
+                          node_attrs=['id', 'timestamp', 'uid', 'user', 'version', 'changeset', 'lat', 'lon'],
+                          edge_tags=['highway', 'lanes', 'maxspeed', 'name', 'oneway'],
+                          edge_attrs=['id', 'timestamp', 'uid', 'user', 'version', 'changeset'])
         logger.info(f'Saved osm xml to {OSM_OUTPUT_DIR}/{OSM_OUTPUT_FILENAME}.osm')
 
     def add_osm_edge(self, from_id, to_id):
         self.graph.add_edge(from_id, to_id,
                             highway='pedestrian',
                             lanes='1',
-                            name='Test',
+                            name='Open Space',
                             oneway=True,
-                            length=40)
+                            )
 
     def add_osm_node(self, coords):
         node_id = self._get_new_node_id()
