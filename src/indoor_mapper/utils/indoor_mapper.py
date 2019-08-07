@@ -65,10 +65,8 @@ class RoomStaircaseController:
             if building.key == room.building_key:
                 logger.warn('STAIRCASE')
                 for staircase in building.staircases:
-                    for level in staircase.floors:
-                        if int(level.level) == int(room.level) and level.room_range_min <= int(
-                                room.number) <= level.room_range_max:
-                            return staircase
+                    if staircase.is_staircase_room(room):
+                        return staircase
         return None
 
     def print_buildings(self):
