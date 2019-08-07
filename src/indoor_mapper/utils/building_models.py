@@ -55,7 +55,7 @@ class Building:
 
     def get_rooms_staircase(self, room: Room):
         for staircase in self.staircases:
-            if room in staircase.rooms:
+            if staircase.is_staircase_room(room):
                 return staircase
         return None
 

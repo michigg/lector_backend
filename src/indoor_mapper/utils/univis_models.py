@@ -1,8 +1,11 @@
 class MinimalRoom:
     def __init__(self, building_key, level, number):
         self.building_key = building_key
-        self.number = number
-        self.level = level
+        self.number = int(number)
+        self.level = int(level)
+
+    def __str__(self):
+        return f'{self.building_key}/{self.level:02d}.{self.number:03d}'
 
 
 class Room:
@@ -15,8 +18,6 @@ class Room:
 
     def _init_room_number(self, univis_room):
         splitted_room_id = str(univis_room['short']).split('/')
-        print('--------------------------------------------------------------------------------------')
-        print(splitted_room_id)
         splitted_room_number = splitted_room_id[1].split('.')
         self.building_key = splitted_room_id[0]
         self.level = int(splitted_room_number[0])
