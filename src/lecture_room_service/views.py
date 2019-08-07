@@ -9,10 +9,13 @@ from rest_framework.response import Response
 
 from indoor_mapper.utils.indoor_mapper import RoomStaircaseController
 from indoor_mapper.utils.univis_models import MinimalRoom
-from lecture_room_service.serializer import LectureSerializer, LonLatSerializer
+from lecture_room_service.serializer import LectureSerializer, LonLatSerializer, RoomSerializer, \
+    SplittedLectureSerializer
 from lecture_room_service.utils.univis_lecture_room_controller import UnivISLectureController
 
 import logging
+
+from lecture_room_service.utils.univis_room_controller import UnivISRoomController
 
 logger = logging.getLogger(__name__)
 
@@ -24,24 +27,33 @@ class ApiLectures(views.APIView):
         if search_token:
             univis_lecture_c = UnivISLectureController()
             lectures = univis_lecture_c.get_lectures_by_token(search_token)
-            lectures = sorted(lectures, key=lambda lecture: lecture.get_first_term().starttime)
-            lectures_before = []
-            lectures_after = []
-            current_time = timezone.localtime(timezone.now())
-            for lecture in lectures:
-                logger.warn(current_time.time())
-                logger.warn(lecture.get_last_term().starttime.time())
-                logger.warn(lecture.get_last_term().starttime.time() < current_time.time())
-                if lecture.get_last_term().starttime.time() < current_time.time():
-                    lectures_before.append(lecture)
-                else:
-                    lectures_after.append(lecture)
+            lectures_after, lectures_before = univis_lecture_c.get_lectures_split_by_date(lectures)
+            lectures_dict = {'before': lectures_before, 'after': lectures_after}
             lectures = lectures_after
             lectures.extend(lectures_before)
-            lectures_dicts = []
-            for lecture in lectures:
-                lectures_dicts.append(lecture.__dict__)
-            results = LectureSerializer(lectures_dicts, many=True).data
+            lectures_dict['before'] = self.get_lectures_as_dicts(lectures_dict['before'])
+            lectures_dict['after'] = self.get_lectures_as_dicts(lectures_dict['after'])
+
+            results = SplittedLectureSerializer(lectures_dict, many=False).data
+            return Response(results, status=status.HTTP_200_OK, headers={'access-control-allow-origin': '*'})
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def get_lectures_as_dicts(self, lectures):
+        return [lecture.__dict__ for lecture in lectures]
+
+
+@permission_classes((AllowAny,))
+class ApiRooms(views.APIView):
+    def get(self, request):
+        search_token = request.GET.get('token', None)
+        if search_token:
+            univis_room_c = UnivISRoomController()
+            rooms = univis_room_c.get_rooms_by_token(token=search_token)
+            room_dicts = []
+            for room in rooms:
+                room_dicts.append(room.__dict__)
+            results = RoomSerializer(room_dicts, many=True).data
             return Response(results, status=status.HTTP_200_OK, headers={'access-control-allow-origin': '*'})
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -61,4 +73,4 @@ class ApiRoomCoord(views.APIView):
                                           many=False).data
                 return Response(result,
                                 status=status.HTTP_200_OK, headers={'access-control-allow-origin': '*'})
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_400_BAD_REQUEST, headers={'access-control-allow-origin': '*'})

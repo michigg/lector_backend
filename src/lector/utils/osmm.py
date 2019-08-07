@@ -1,4 +1,5 @@
 import logging
+from typing import List
 
 import osmnx as ox
 from shapely.geometry import Point
@@ -29,21 +30,22 @@ class OSMManipulator:
 
     def add_open_spaces(self):
         self.osp_c.insert_open_spaces()
+        # pass
 
     def add_indoor_maps(self):
-        self.indoor_map_c.load_indoor_map_data()
+        # self.indoor_map_c.load_indoor_map_data()
         self.indoor_map_c.indoor_maps_to_graph()
         self.indoor_map_c.add_staircase_to_graph()
 
     @staticmethod
     def download_map():
-        return ox.graph_from_address('Markusplatz, Bamberg, Oberfranken, Bayern, 96047, Deutschland',
-                                     network_type='all',
-                                     distance=1200, simplify=False)
         # return ox.graph_from_address('Markusplatz, Bamberg, Oberfranken, Bayern, 96047, Deutschland',
         #                              network_type='all',
-        #                              distance=500)
-        # return ox.graph_from_bbox(*BAMBERG_BBOX, simplify=False)
+        #                              distance=1200, simplify=False)
+        # return ox.graph_from_address('Markusplatz, Bamberg, Oberfranken, Bayern, 96047, Deutschland',
+        #                              network_type='all',
+        #                              distance=500, simplify=False)
+        return ox.graph_from_bbox(*BAMBERG_BBOX, simplify=False)
 
     @staticmethod
     def load_map():
@@ -76,9 +78,10 @@ class OSMManipulator:
                             oneway=True,
                             )
 
-    def add_osm_node(self, coords):
+    def add_osm_node(self, coords: List[List[float]]):
         node_id = self._get_new_node_id()
         self.graph.add_node(node_id, osmid=node_id, x=coords[0], y=coords[1])
+        return node_id
 
     def _get_new_node_id(self) -> int:
         self.current_osm_id += 1

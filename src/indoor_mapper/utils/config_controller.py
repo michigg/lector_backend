@@ -4,6 +4,7 @@ import os
 from typing import List
 
 from indoor_mapper.utils.building_models import Building, Floor, StairCase
+from lector.utils.open_space_models import BuildingEntryPoint
 
 logger = logging.getLogger(__name__)
 
@@ -23,15 +24,32 @@ class IndoorMapperConfigController:
         return [f for f in os.listdir(self.config_dir) if f.endswith('.json')]
 
     def _get_buildings(self) -> List[Building]:
-        building_objs = []
-        for file in self._get_build_config_files():
-            building = self._load_building_config(file)
-            staircase_objs = []
-            for staircase in building['staircases']:
-                floor_objs = []
-                for floor in staircase['floors']:
-                    floor_objs.append(Floor(floor['level'], floor['room_range_min'], floor['room_range_max']))
-                staircase_objs.append(
-                    StairCase(staircase['name'], floor_objs, staircase['coord'], staircase['entries']))
-            building_objs.append(Building(building['building_id'], staircase_objs))
-        return building_objs
+        return [self._get_building(self._load_building_config(file)) for file in self._get_build_config_files()]
+
+    def _get_building(self, building: dict):
+        return Building(building['building_id'], self._get_staircases(building))
+
+    def _get_staircases(self, building: dict):
+        return [self._get_staircase(staircase) for staircase in building['staircases']]
+
+    @staticmethod
+    def _get_staircase_floors(staircase: dict):
+        return [Floor(floor['level'], floor['ranges']) for floor in staircase['floors']]
+
+    @staticmethod
+    def _get_staircase_entry_points(staircase: dict):
+        return [BuildingEntryPoint(entry) for entry in staircase['entries']]
+
+    @staticmethod
+    def _get_staircase_coord(staircase: dict):
+        return staircase['coord']
+
+    @staticmethod
+    def _get_staircase_name(staircase: dict):
+        return staircase['name']
+
+    def _get_staircase(self, staircase):
+        return StairCase(self._get_staircase_name(staircase),
+                         self._get_staircase_floors(staircase),
+                         self._get_staircase_coord(staircase),
+                         self._get_staircase_entry_points(staircase))

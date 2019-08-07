@@ -2,6 +2,7 @@ from typing import List
 
 import requests
 import xmltodict
+from django.utils import timezone
 
 from lecture_room_service.utils.univis_models import Room, Lecture, Person
 
@@ -70,3 +71,18 @@ class UnivISLectureController:
             print(lecture)
         print(f'FOUND LECTURES {len(clean_lectures)}')
         return clean_lectures
+
+    def get_lectures_split_by_date(self, lectures):
+        current_time = timezone.localtime(timezone.now())
+        lectures = self.get_lectures_sorted_by_starttime(lectures)
+        lectures_before = []
+        lectures_after = []
+        for lecture in lectures:
+            if lecture.get_last_term().starttime.time() < current_time.time():
+                lectures_before.append(lecture)
+            else:
+                lectures_after.append(lecture)
+        return lectures_after, lectures_before
+
+    def get_lectures_sorted_by_starttime(self, lectures):
+        return sorted(lectures, key=lambda lecture: lecture.get_first_term().starttime)

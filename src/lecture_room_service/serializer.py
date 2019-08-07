@@ -45,3 +45,8 @@ class LectureSerializer(serializers.Serializer):
     lecturers = PersonSerializer(many=True)
     parent_lecture_ref = serializers.CharField(read_only=True, max_length=100)
     parent_lecture = serializers.CharField(read_only=True, max_length=100)
+
+
+class SplittedLectureSerializer(serializers.Serializer):
+    before = LectureSerializer(read_only=True, many=True)
+    after = LectureSerializer(read_only=True, many=True)

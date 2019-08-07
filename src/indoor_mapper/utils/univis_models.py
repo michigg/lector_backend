@@ -7,6 +7,7 @@ class MinimalRoom:
 
 class Room:
     def __init__(self, univis_room):
+        print(univis_room)
         self.building_key = None
         self.number = None
         self.level = None
@@ -14,6 +15,8 @@ class Room:
 
     def _init_room_number(self, univis_room):
         splitted_room_id = str(univis_room['short']).split('/')
+        print('--------------------------------------------------------------------------------------')
+        print(splitted_room_id)
         splitted_room_number = splitted_room_id[1].split('.')
         self.building_key = splitted_room_id[0]
         self.level = int(splitted_room_number[0])

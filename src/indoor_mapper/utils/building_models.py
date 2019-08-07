@@ -1,18 +1,23 @@
 from typing import List
 
 from indoor_mapper.utils.univis_models import Room
-from lector.utils.open_space_models import EntryPoint
+from lector.utils.open_space_models import EntryPoint, BuildingEntryPoint
 
 
 class Floor:
-    def __init__(self, level, room_range_min, room_range_max):
+    def __init__(self, level: int or str, ranges: List[List[int]]):
         self.level = level
-        self.room_range_min = room_range_min
-        self.room_range_max = room_range_max
+        self.ranges = ranges
+
+    def is_floor_room(self, room: Room):
+        for range in self.ranges:
+            if range[0] <= room.number <= range[1]:
+                return True
+        return False
 
 
 class StairCase:
-    def __init__(self, name, floors: List[Floor], coord, entries: List[List[float]]):
+    def __init__(self, name, floors: List[Floor], coord, entries: List[BuildingEntryPoint]):
         self.name = name
         self.coord = coord
         self.entries = entries
@@ -24,6 +29,12 @@ class StairCase:
         self.rooms.append(room)
         self.rooms.sort(key=lambda x: x.number)
 
+    def is_staircase_room(self, room: Room):
+        for floor in self.floors:
+            if room.level == floor.level and floor.is_floor_room(room):
+                return True
+        return False
+
     def __str__(self):
         output = f'Staircase {self.name}\n'
         for room in self.rooms:
@@ -32,10 +43,9 @@ class StairCase:
 
 
 class GraphStairCase(StairCase):
-    def __init__(self, staircase: StairCase, position_id: int, entry_ids: List[EntryPoint]):
+    def __init__(self, staircase: StairCase, position_id: int):
         super().__init__(staircase.name, staircase.floors, staircase.coord, staircase.entries)
         self.position_id = position_id
-        self.entry_points = entry_ids
 
 
 class Building:
