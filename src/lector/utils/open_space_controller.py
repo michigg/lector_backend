@@ -1,4 +1,5 @@
 import logging
+from typing import List
 
 from lector.utils.open_space_config_controller import OpenSpaceConfigController
 from lector.utils.open_space_models import OpenSpace
@@ -21,6 +22,9 @@ class OpenSpaceController:
         open_spaces = self.osp_config_c.get_open_spaces()
         for open_space in open_spaces:
             self.insert_open_space(open_space)
+
+    def get_graph_open_spaces(self) -> List[GraphOpenSpace]:
+        return [GraphOpenSpace(open_space, self.osmm) for open_space in self.osp_config_c.get_open_spaces()]
 
     def insert_open_space(self, open_space: OpenSpace):
         logger.info(f'Insert Open Space')

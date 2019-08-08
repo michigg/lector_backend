@@ -6,12 +6,13 @@ from shapely.geometry import Point
 from shapely.ops import nearest_points
 
 from indoor_mapper.utils.indoor_mapper import IndoorMapController
+from lector.utils.graph_open_space_models import GraphOpenSpace
 from lector.utils.open_space_controller import OpenSpaceController
-from lector.utils.open_space_models import EntryPoint
+from lector.utils.open_space_models import EntryPoint, BuildingEntryPoint
 
 logger = logging.getLogger(__name__)
 
-ox.config(log_console=False, use_cache=True)
+ox.config(log_console=True, use_cache=True)
 
 BAMBERG_BBOX = [49.925145775384436, 49.865874134216426, 10.951995849609375, 10.836982727050781]
 # BAMBERG_BBOX = [49.9954, 49.7511, 10.7515, 11.1909]
@@ -27,6 +28,38 @@ class OSMManipulator:
         self.current_osm_id = 0
         self.osp_c = OpenSpaceController(self)
         self.indoor_map_c = IndoorMapController(self)
+
+    def add_open_spaces_with_staircases(self):
+        graph_open_spaces = self.osp_c.get_graph_open_spaces()
+        for graph_open_space in graph_open_spaces:
+            graph_open_space.add_walkable_edges()
+            graph_open_space.add_restricted_area_edges()
+
+        graph_buildings = self.indoor_map_c.add_staircase_to_graph()
+        print(graph_open_spaces)
+        for graph_building in graph_buildings:
+            for staircase in graph_building.staircases:
+                for entry_point in staircase.entries:
+                    self.update_open_spaces(entry_point, graph_open_spaces)
+
+        for graph_open_space in graph_open_spaces:
+            graph_open_space.add_visiblity_graph_edges()
+            self.add_entry_edges(graph_open_space.entry_points)
+
+    def update_open_spaces(self, entry_point: BuildingEntryPoint, graph_open_spaces: List[GraphOpenSpace]):
+        for graph_open_space in graph_open_spaces:
+            print("Open Space", graph_open_space)
+            if graph_open_space.is_open_space_walkable_node(entry_point.graph_entry_edge[0]):
+                graph_open_space.walkable_area_nodes.append(entry_point.open_space_node_id)
+                graph_open_space.walkable_area_nodes = sorted(graph_open_space.walkable_area_nodes)
+                print("Graph Walkable: ", graph_open_space.walkable_area_nodes)
+            restricted_area_id = graph_open_space.is_open_space_restricted_area_node(entry_point.graph_entry_edge[0])
+            if graph_open_space.is_open_space_restricted_area_node(entry_point.graph_entry_edge[0]) > -1:
+                graph_open_space.restricted_areas_nodes[restricted_area_id].append(entry_point.open_space_node_id)
+                graph_open_space.restricted_areas_nodes[restricted_area_id] = sorted(
+                    graph_open_space.restricted_areas_nodes[restricted_area_id])
+                print(f"Graph Restricted: {restricted_area_id}",
+                      graph_open_space.restricted_areas_nodes[restricted_area_id])
 
     def add_open_spaces(self):
         self.osp_c.insert_open_spaces()
@@ -44,7 +77,7 @@ class OSMManipulator:
         #                              distance=1200, simplify=False)
         # return ox.graph_from_address('Markusplatz, Bamberg, Oberfranken, Bayern, 96047, Deutschland',
         #                              network_type='all',
-        #                              distance=500, simplify=False)
+        #                              distance=600, simplify=False)
         return ox.graph_from_bbox(*BAMBERG_BBOX, simplify=False)
 
     @staticmethod
@@ -101,8 +134,7 @@ class OSMManipulator:
     def add_entry_edges(self, entry_points):
         edges = len(self.graph.edges)
         for entry_point in entry_points:
-            self.add_osm_node(entry_point.graph_entry_node_coord)
-            entry_point.nearest_graph_node_id = self.current_osm_id
+            entry_point.nearest_graph_node_id = self.add_osm_node(entry_point.graph_entry_node_coord)
             self.add_osm_edge(entry_point.graph_entry_edge[0], entry_point.nearest_graph_node_id)
             self.add_osm_edge(entry_point.graph_entry_edge[1], entry_point.nearest_graph_node_id)
             self.add_osm_edge(entry_point.nearest_graph_node_id, entry_point.open_space_node_id)

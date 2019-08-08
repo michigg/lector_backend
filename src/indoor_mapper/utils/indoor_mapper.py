@@ -41,13 +41,15 @@ class IndoorMapController:
         # print(f'ADDED NODES: {len(self.graph.nodes) - nodes}')
         return graph_buildings
 
-    def add_staircase_to_graph(self):
-        for building in self.indoor_maps_to_graph():
+    def add_staircase_to_graph(self) -> List[GraphBuilding]:
+        graph_buildings = self.indoor_maps_to_graph()
+        for building in graph_buildings:
             for staircase in building.graph_staircases:
                 for entry_point in staircase.entries:
                     self.osmm.set_nearest_point_to_entry(entry_point)
                 self.osmm.add_entry_edges(staircase.entries)
                 self.add_staircase_edges(staircase)
+        return graph_buildings
 
     def add_staircase_edges(self, staircase: GraphStairCase):
         edges = len(self.graph.edges)

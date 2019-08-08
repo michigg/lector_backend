@@ -24,6 +24,15 @@ class GraphOpenSpace(OpenSpace):
         self.edges = []
         self._set_node_ids()
 
+    def is_open_space_walkable_node(self, node_id):
+        return node_id in self.walkable_area_nodes
+
+    def is_open_space_restricted_area_node(self, node_id):
+        for index, restricted_area_nodes in enumerate(self.restricted_areas_nodes):
+            if node_id in restricted_area_nodes:
+                return index
+        return -1
+
     def _set_node_ids(self):
         for entry_point in self.entry_points:
             self.osmm.set_nearest_point_to_entry(entry_point)
