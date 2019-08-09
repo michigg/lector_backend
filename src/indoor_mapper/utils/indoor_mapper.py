@@ -64,7 +64,8 @@ class RoomStaircaseController:
 
     def get_rooms_staircase(self, room) -> StairCase or None:
         for building in self.indoor_cc.buildings:
-            if building.key == room.building_key:
+            if str(building.key).lower() == str(room.building_key).lower():
+                logger.warn(building)
                 staircase = building.get_rooms_staircase(room)
                 if staircase:
                     return staircase

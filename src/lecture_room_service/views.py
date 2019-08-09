@@ -27,17 +27,18 @@ class ApiLectures(views.APIView):
         if search_token:
             univis_lecture_c = UnivISLectureController()
             lectures = univis_lecture_c.get_lectures_by_token(search_token)
-            lectures_after, lectures_before = univis_lecture_c.get_lectures_split_by_date(lectures)
-            lectures_dict = {'before': lectures_before, 'after': lectures_after}
-            lectures = lectures_after
-            lectures.extend(lectures_before)
-            lectures_dict['before'] = self.get_lectures_as_dicts(lectures_dict['before'])
-            lectures_dict['after'] = self.get_lectures_as_dicts(lectures_dict['after'])
+            if lectures:
+                lectures_after, lectures_before = univis_lecture_c.get_lectures_split_by_date(lectures)
+                lectures_dict = {'before': lectures_before, 'after': lectures_after}
+                lectures_dict['before'] = self.get_lectures_as_dicts(lectures_dict['before'])
+                lectures_dict['after'] = self.get_lectures_as_dicts(lectures_dict['after'])
+                results = SplittedLectureSerializer(lectures_dict, many=False).data
 
-            results = SplittedLectureSerializer(lectures_dict, many=False).data
-            return Response(results, status=status.HTTP_200_OK, headers={'access-control-allow-origin': '*'})
+                return Response(results, status=status.HTTP_200_OK, headers={'access-control-allow-origin': '*'})
+            else:
+                return Response(status=status.HTTP_204_NO_CONTENT, headers={'access-control-allow-origin': '*'})
         else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST, headers={'access-control-allow-origin': '*'})
 
     def get_lectures_as_dicts(self, lectures):
         return [lecture.__dict__ for lecture in lectures]
@@ -49,14 +50,14 @@ class ApiRooms(views.APIView):
         search_token = request.GET.get('token', None)
         if search_token:
             univis_room_c = UnivISRoomController()
-            rooms = univis_room_c.get_rooms_by_token(token=search_token)
+            rooms = sorted(univis_room_c.get_rooms_by_token(token=search_token), key=lambda room: room.__str__())
             room_dicts = []
             for room in rooms:
                 room_dicts.append(room.__dict__)
             results = RoomSerializer(room_dicts, many=True).data
             return Response(results, status=status.HTTP_200_OK, headers={'access-control-allow-origin': '*'})
         else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST, headers={'access-control-allow-origin': '*'})
 
 
 @permission_classes((AllowAny,))
@@ -68,6 +69,7 @@ class ApiRoomCoord(views.APIView):
         if building and level and number:
             room_staircase_c = RoomStaircaseController()
             staircase = room_staircase_c.get_rooms_staircase(MinimalRoom(building, level, number))
+            logger.warn(staircase)
             if staircase:
                 result = LonLatSerializer({'longitude': staircase.coord[0], 'latitude': staircase.coord[1]},
                                           many=False).data

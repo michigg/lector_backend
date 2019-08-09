@@ -6,6 +6,10 @@ from django.utils import timezone
 
 from lecture_room_service.utils.univis_models import Room, Lecture, Person
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class UnivISLectureController:
     def __init__(self):
@@ -20,27 +24,30 @@ class UnivISLectureController:
 
     def get_rooms(self, data: dict) -> List[Room]:
         rooms = []
-        if type(data['UnivIS']['Room']) is list:
-            for room in data['UnivIS']['Room']:
-                rooms.append(Room(room))
-        else:
-            rooms.append(Room(data['UnivIS']['Room']))
+        if 'Room' in data['UnivIS']:
+            if type(data['UnivIS']['Room']) is list:
+                for room in data['UnivIS']['Room']:
+                    rooms.append(Room(room))
+            else:
+                rooms.append(Room(data['UnivIS']['Room']))
         return rooms
 
     def get_persons(self, data: dict) -> List[Person]:
         persons = []
-        for person in data['UnivIS']['Person']:
-            persons.append(Person(person))
+        if 'Person' in data['UnivIS']:
+            for person in data['UnivIS']['Person']:
+                persons.append(Person(person))
         return persons
 
     def get_lectures(self, data: dict, rooms: List[Room]) -> List[Lecture]:
         lectures = []
-        if type(data['UnivIS']['Lecture']) is list:
-            for lecture in data['UnivIS']['Lecture']:
-                if 'terms' in lecture:
-                    lectures.append(Lecture(lecture, rooms))
-        else:
-            lectures.append(Lecture(data['UnivIS']['Lecture'], rooms))
+        if 'Lecture' in data['UnivIS']:
+            if type(data['UnivIS']['Lecture']) is list:
+                for lecture in data['UnivIS']['Lecture']:
+                    if 'terms' in lecture:
+                        lectures.append(Lecture(lecture, rooms))
+            else:
+                lectures.append(Lecture(data['UnivIS']['Lecture'], rooms))
         return lectures
 
     def get_univis_key_dict(self, objects):
