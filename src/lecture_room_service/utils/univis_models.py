@@ -98,7 +98,8 @@ class Lecture:
                  'HS': LectureType.MAIN_SEMINAR, 'K': LectureType.COURSE, 'SA': LectureType.LANGUAGE_TRAINING,
                  'V/SP': LectureType.LECTURE_WITH_STUDYACCOMPANYING_EXAMINATION, 'GS': LectureType.TERRAIN_SEMINAR,
                  'PROJ': LectureType.PROJECT, 'PUE': LectureType.PRAKTIKUM_EXERCISE}
-        return types[univis_type]
+
+        return types[univis_type] if univis_type in types else None
 
     def get_first_term(self) -> List[LectureTerm] or None:
         sorted_terms = sorted(self.terms, key=lambda x: x.starttime)
