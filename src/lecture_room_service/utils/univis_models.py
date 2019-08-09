@@ -48,6 +48,7 @@ class LectureType(Enum):
     LECTURE_WITH_STUDYACCOMPANYING_EXAMINATION = "Vorlesung mit studienbegleitender Prüfung"
     TERRAIN_SEMINAR = "Geländeseminar"
     PROJECT = "Project"
+    PRAKTIKUM_EXERCISE = "Praktikum / Übung"
 
 
 class LectureTerm:
@@ -96,7 +97,7 @@ class Lecture:
                  'BS': LectureType.BLOCK_SEMINAR, 'Ü/BS': LectureType.EXERCISE_BLOCK_SEMINAR,
                  'HS': LectureType.MAIN_SEMINAR, 'K': LectureType.COURSE, 'SA': LectureType.LANGUAGE_TRAINING,
                  'V/SP': LectureType.LECTURE_WITH_STUDYACCOMPANYING_EXAMINATION, 'GS': LectureType.TERRAIN_SEMINAR,
-                 'PROJ': LectureType.PROJECT}
+                 'PROJ': LectureType.PROJECT, 'PUE': LectureType.PRAKTIKUM_EXERCISE}
         return types[univis_type]
 
     def get_first_term(self) -> List[LectureTerm] or None:
