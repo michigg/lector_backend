@@ -15,24 +15,24 @@ class OpenSpaceConfigController:
         self.open_spaces = self._load_open_spaces()
         logger.info(f'LOADED OPEN SPACES {len(self.open_spaces)}')
 
-    def _load_geojson(self, file='markusplatz.geojson'):
+    def load_geojson(self, file):
         logger.info(f'LOAD geojson of file {self.config_dir}/{file}')
         with open(f'{self.config_dir}/{file}') as f:
-            return json.load(f)
+            return {'file_name': file, 'geojson': json.load(f)}
 
-    def _get_geojson_files(self):
+    def get_open_spaces_files(self):
         return [f for f in os.listdir(self.config_dir) if f.endswith('.geojson') or f.endswith('.json')]
 
     def _get_geojsons(self):
-        files = self._get_geojson_files()
+        files = self.get_open_spaces_files()
         logger.info(f'FOUND {len(files)} geojsons')
-        return [self._load_geojson(file) for file in files]
+        return [self.load_geojson(file) for file in files]
 
-    def _get_open_space(self, geojson) -> OpenSpace:
+    def _load_open_space(self, data: dict) -> OpenSpace:
         walkables = []
         restricted = []
         entry_points = []
-        for feature in geojson['features']:
+        for feature in data['geojson']['features']:
             if "walkable" in feature['properties']:
                 if feature['properties']['walkable'] == 'True':
                     walkables.append(feature['geometry']['coordinates'][0])
@@ -46,10 +46,16 @@ class OpenSpaceConfigController:
             logger.error(f'No walkable area found! Area dismissed!')
             return OpenSpace()
         else:
-            return OpenSpace(walkables[0], restricted, entry_points)
+            return OpenSpace(data['file_name'], walkables[0], restricted, entry_points)
 
     def _load_open_spaces(self):
-        return [self._get_open_space(geojson) for geojson in self._get_geojsons()]
+        return [self._load_open_space(geojson) for geojson in self._get_geojsons()]
+
+    def get_open_space(self, file_name: str) -> OpenSpace or None:
+        for open_space in self.open_spaces:
+            if open_space.file_name == file_name:
+                return open_space
+        return None
 
     def get_open_spaces(self) -> List[OpenSpace]:
         return self.open_spaces

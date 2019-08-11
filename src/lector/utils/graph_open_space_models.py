@@ -12,7 +12,8 @@ from lector.utils.open_space_models import OpenSpace, logger
 
 class GraphOpenSpace(OpenSpace):
     def __init__(self, open_space: OpenSpace, osmm):
-        super().__init__(walkable_area=open_space.walkable_area, restricted_areas=open_space.restricted_areas,
+        super().__init__(file_name=open_space.file_name, walkable_area=open_space.walkable_area,
+                         restricted_areas=open_space.restricted_areas,
                          entry_points=open_space.entry_points)
         self.osmm = osmm
         self.walkable_area_poly = Polygon(open_space.walkable_area)

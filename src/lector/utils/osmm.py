@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 ox.config(log_console=True, use_cache=True)
 
 BAMBERG_BBOX = [49.925145775384436, 49.865874134216426, 10.951995849609375, 10.836982727050781]
-# BAMBERG_BBOX = [49.9954, 49.7511, 10.7515, 11.1909]
 
 OSM_OUTPUT_FILENAME = "data"
 OSM_OUTPUT_DIR = "/osm_data"
@@ -24,27 +23,42 @@ SERVICE_NAME = 'graphhopper'
 
 class OSMManipulator:
     def __init__(self):
-        self.graph = self.download_map()
+        self.graph = None
         self.current_osm_id = 0
         self.osp_c = OpenSpaceController(self)
         self.indoor_map_c = IndoorMapController(self)
 
     def add_open_spaces_with_staircases(self):
+        self.download_map()
         graph_open_spaces = self.osp_c.get_graph_open_spaces()
         for graph_open_space in graph_open_spaces:
-            graph_open_space.add_walkable_edges()
-            graph_open_space.add_restricted_area_edges()
+            self.add_open_space_with_staircases(graph_open_space, graph_open_spaces)
 
+    def add_open_space_with_staircases(self, graph_open_space, graph_open_spaces):
+        graph_open_space.add_walkable_edges()
+        graph_open_space.add_restricted_area_edges()
         graph_buildings = self.indoor_map_c.add_staircase_to_graph()
-        print(graph_open_spaces)
         for graph_building in graph_buildings:
             for staircase in graph_building.staircases:
                 for entry_point in staircase.entries:
                     self.update_open_spaces(entry_point, graph_open_spaces)
+        graph_open_space.add_visiblity_graph_edges()
+        self.add_entry_edges(graph_open_space.entry_points)
 
-        for graph_open_space in graph_open_spaces:
-            graph_open_space.add_visiblity_graph_edges()
-            self.add_entry_edges(graph_open_space.entry_points)
+    #     TODO: Restructure that !!
+    def add_custom_open_spaces_with_buildings(self, graph_open_space, graph_open_spaces):
+        graph_open_space.add_walkable_edges()
+        graph_open_space.add_restricted_area_edges()
+        buildings = self.indoor_map_c.get_buildings_for_open_space(graph_open_space)
+        graph_buildings = self.indoor_map_c.get_graph_buildings(buildings)
+        self.indoor_map_c.add_buildings_to_graph(graph_buildings)
+        for graph_building in graph_buildings:
+            for staircase in graph_building.staircases:
+                for entry_point in staircase.entries:
+                    self.update_open_spaces(entry_point, graph_open_spaces)
+        graph_open_space.add_visiblity_graph_edges()
+        self.add_entry_edges(graph_open_space.entry_points)
+
 
     def update_open_spaces(self, entry_point: BuildingEntryPoint, graph_open_spaces: List[GraphOpenSpace]):
         for graph_open_space in graph_open_spaces:
@@ -63,34 +77,35 @@ class OSMManipulator:
 
     def add_open_spaces(self):
         self.osp_c.insert_open_spaces()
-        # pass
 
     def add_indoor_maps(self):
         # self.indoor_map_c.load_indoor_map_data()
         self.indoor_map_c.indoor_maps_to_graph()
         self.indoor_map_c.add_staircase_to_graph()
 
-    @staticmethod
-    def download_map():
-        # return ox.graph_from_address('Markusplatz, Bamberg, Oberfranken, Bayern, 96047, Deutschland',
-        #                              network_type='all',
-        #                              distance=1200, simplify=False)
-        # return ox.graph_from_address('Markusplatz, Bamberg, Oberfranken, Bayern, 96047, Deutschland',
-        #                              network_type='all',
-        #                              distance=600, simplify=False)
-        return ox.graph_from_bbox(*BAMBERG_BBOX, simplify=False)
+    def download_map(self, bbox: List[float] = BAMBERG_BBOX):
+        self.graph = ox.graph_from_bbox(*bbox, simplify=False)
+        return self.graph
 
     @staticmethod
     def load_map():
         return ox.graph_from_file(f'{OSM_OUTPUT_DIR}/{OSM_OUTPUT_FILENAME}.osm')
 
-    def plot_graph(self):
-        ox.plot_graph(self.graph,
-                      save=True,
-                      file_format='svg',
-                      filename=f'{OSM_OUTPUT_DIR}/network_plot',
-                      edge_linewidth=0.025,
-                      node_size=0.1)
+    def plot_graph(self, output_dir=None, file_name=None, minimized=True):
+        if output_dir and file_name and not minimized:
+            ox.plot_graph(self.graph,
+                          save=True,
+                          file_format='svg',
+                          filename=f'{output_dir}/{file_name}',
+                          edge_linewidth=0.5,
+                          node_size=1)
+        else:
+            ox.plot_graph(self.graph,
+                          save=True,
+                          file_format='svg',
+                          filename=f'{OSM_OUTPUT_DIR}/network_plot',
+                          edge_linewidth=0.025,
+                          node_size=0.1)
 
     def save_graph(self):
         ox.save_graph_osm(self.graph,

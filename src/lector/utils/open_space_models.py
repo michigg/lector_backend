@@ -32,7 +32,26 @@ class BuildingEntryPoint(EntryPoint):
 
 
 class OpenSpace:
-    def __init__(self, walkable_area: List, restricted_areas: List, entry_points: List[EntryPoint]):
+    def __init__(self, file_name: str, walkable_area: List, restricted_areas: List, entry_points: List[EntryPoint]):
+        self.file_name = file_name
         self.walkable_area = walkable_area
         self.restricted_areas = restricted_areas
         self.entry_points = entry_points
+
+    def get_boundaries(self):
+        min_lat = 360
+        max_lat = -360
+        min_lon = 360
+        max_lon = -360
+        boundary_extetion = 0.0005
+        for coord in self.walkable_area:
+            min_lat = coord[1] if coord[1] < min_lat else min_lat
+            max_lat = coord[1] if coord[1] > max_lat else max_lat
+            min_lon = coord[0] if coord[0] < min_lon else min_lon
+            max_lon = coord[0] if coord[0] > max_lon else max_lon
+
+        min_lat -= boundary_extetion
+        max_lat += boundary_extetion
+        min_lon -= boundary_extetion
+        max_lon += boundary_extetion
+        return [max_lat, min_lat, max_lon, min_lon]

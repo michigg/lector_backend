@@ -4,6 +4,7 @@ from typing import List
 from lector.utils.open_space_config_controller import OpenSpaceConfigController
 from lector.utils.open_space_models import OpenSpace
 from lector.utils.graph_open_space_models import GraphOpenSpace
+from django.conf import settings
 
 # from lector.utils.osmm import OSMManipulator as OSMUtils
 
@@ -24,7 +25,10 @@ class OpenSpaceController:
             self.insert_open_space(open_space)
 
     def get_graph_open_spaces(self) -> List[GraphOpenSpace]:
-        return [GraphOpenSpace(open_space, self.osmm) for open_space in self.osp_config_c.get_open_spaces()]
+        return [self.get_graph_open_space(open_space) for open_space in self.osp_config_c.get_open_spaces()]
+
+    def get_graph_open_space(self, open_space: OpenSpace) -> GraphOpenSpace:
+        return GraphOpenSpace(open_space, self.osmm)
 
     def insert_open_space(self, open_space: OpenSpace):
         logger.info(f'Insert Open Space')
