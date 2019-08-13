@@ -1,10 +1,11 @@
+import os
 from typing import List
 
 import osmnx as ox
 from shapely.geometry import Polygon, LineString
 from shapely.prepared import prep
 
-from lector.utils.open_space_models import OpenSpace
+from lector.utils.open_space_models import OpenSpace, GraphOpenSpaceEntryPoint
 
 
 class GraphOpenSpace(OpenSpace):
@@ -26,6 +27,8 @@ class GraphOpenSpace(OpenSpace):
         self.blocked_area_polys = [Polygon(blocked_area) for blocked_area in self.blocked_areas_coords]
         self.blocked_areas_nodes = []
 
+        self.graph_entry_points = []
+
         self.edges = []
         self._set_node_ids()
 
@@ -45,7 +48,7 @@ class GraphOpenSpace(OpenSpace):
 
     def add_edge(self, from_id: int, to_id: int):
         self.edges.append([from_id, to_id])
-        self.osmm.add_osm_edge(from_id, to_id)
+        self.osmm.add_osm_edge(from_id, to_id, self.get_name())
 
     def is_visible_edge(self, line) -> bool:
         if self.is_internal_edge(line):
@@ -140,14 +143,15 @@ class GraphOpenSpace(OpenSpace):
                 return
 
     def _set_node_ids(self):
-        for entry_point in self.entry_points:
-            self.osmm.set_nearest_point_to_entry(entry_point)
+        self.graph_entry_points = [GraphOpenSpaceEntryPoint(entry_point, self.osmm) for entry_point in
+                                   self.entry_points]
+        # self.osmm.set_nearest_point_to_entry(entry_point)
 
         # Set Walkable Area Nodes
         self.walkable_area_nodes = [self.osmm.add_osm_node(point) for point in self.walkable_area_coords]
 
         #   Set Entry Point to Open Space
-        for entry_point in self.entry_points:
+        for entry_point in self.graph_entry_points:
             entry_point.open_space_node_id = ox.get_nearest_node(self.osmm.graph, entry_point.open_space_coord[::-1])
         # Set Restricted Area Nodes
         for restricted_area_coords in self.restricted_areas_coords:
@@ -156,14 +160,16 @@ class GraphOpenSpace(OpenSpace):
         # Set Blocked Areas
         for blocked_area_coords in self.blocked_areas_nodes:
             self.blocked_areas_nodes.append([self.osmm.add_osm_node(coord) for coord in blocked_area_coords])
+    def get_name(self):
+        os.path.basename(self.file_name)
 
     def _set_polygon_edges(self, nodes):
         last_node = None
         for node in nodes:
             if last_node:
-                self.osmm.add_osm_edge(last_node, node)
+                self.osmm.add_osm_edge(last_node, node, name=self.get_name())
             last_node = node
-        self.osmm.add_osm_edge(nodes[0], nodes[-1])
+        self.osmm.add_osm_edge(nodes[0], nodes[-1], name=self.get_name())
 
     def _remove_polygon_edges(self, nodes):
         last_node = None

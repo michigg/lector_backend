@@ -2,13 +2,11 @@ import logging
 from typing import List
 
 import osmnx as ox
-from shapely.geometry import Point
-from shapely.ops import nearest_points
 
 from indoor_mapper.utils.indoor_mapper import IndoorMapController
 from lector.utils.graph_open_space_models import GraphOpenSpace
 from lector.utils.open_space_controller import OpenSpaceController
-from lector.utils.open_space_models import EntryPoint, BuildingEntryPoint, BBox
+from lector.utils.open_space_models import BBox
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +59,7 @@ class OSMManipulator:
 
             # Generate Visibility graph
             graph_open_space.add_visibility_graph_edges()
-            self.add_entry_edges(graph_open_space.entry_points)
+            self.add_entry_edges(graph_open_space.graph_entry_points)
             self.plot_graph(output_dir="/osm_data", file_name=graph_open_space.file_name, minimized=False)
 
     def test3(self):
@@ -166,52 +164,11 @@ class OSMManipulator:
 
             # Generate Visibility graph
             graph_open_space.add_visibility_graph_edges()
-            self.add_entry_edges(graph_open_space.entry_points)
+            for entry_point in graph_open_space.graph_entry_points:
+                entry_point.add_edges()
+            # self.add_entry_edges(graph_open_space.entry_points)
             self.plot_graph(output_dir="/osm_data", file_name=graph_open_space.file_name, minimized=False)
             return
-
-    def add_open_spaces_with_staircases(self):
-        self.download_map()
-        graph_open_spaces = self.osp_c.get_graph_open_spaces()
-        for graph_open_space in graph_open_spaces:
-            self.add_open_space_with_staircases(graph_open_space, graph_open_spaces)
-
-    def add_open_space_with_staircases(self, graph_open_space, graph_open_spaces):
-        graph_open_space.add_walkable_edges()
-        graph_open_space.add_restricted_area_edges()
-        graph_buildings = self.indoor_map_c.add_staircase_to_graph()
-        for graph_building in graph_buildings:
-            for staircase in graph_building.staircases:
-                for entry_point in staircase.entries:
-                    self.update_open_spaces(entry_point, graph_open_spaces)
-        graph_open_space.add_visibility_graph_edges()
-        self.add_entry_edges(graph_open_space.entry_points)
-
-    #     TODO: Restructure that !!
-    def add_custom_open_spaces_with_buildings(self, graph_open_space, graph_open_spaces):
-        graph_open_space.add_walkable_edges()
-        graph_open_space.add_restricted_area_edges()
-        buildings = self.indoor_map_c.get_buildings_for_open_space(graph_open_space)
-        graph_buildings = self.indoor_map_c.get_graph_buildings(buildings)
-        self.indoor_map_c.add_buildings_to_graph(graph_buildings)
-        for graph_building in graph_buildings:
-            for staircase in graph_building.staircases:
-                for entry_point in staircase.entries:
-                    self.update_open_spaces(entry_point, graph_open_spaces)
-        graph_open_space.add_visibility_graph_edges()
-        self.add_entry_edges(graph_open_space.entry_points)
-
-    def update_open_spaces(self, entry_point: BuildingEntryPoint, graph_open_spaces: List[GraphOpenSpace]):
-        for graph_open_space in graph_open_spaces:
-            graph_open_space.add_building_entry_to_open_space(entry_point)
-
-    def add_open_spaces(self):
-        self.osp_c.insert_open_spaces()
-
-    def add_indoor_maps(self):
-        # self.indoor_map_c.load_indoor_map_data()
-        self.indoor_map_c.indoor_maps_to_graph()
-        self.indoor_map_c.add_staircase_to_graph()
 
     def download_map(self, bbox: BBox = BAMBERG_BBOX):
         return ox.graph_from_bbox(*bbox.get_bbox(), simplify=False)
@@ -228,7 +185,6 @@ class OSMManipulator:
                           filename=f'{output_dir}/{file_name}',
                           edge_linewidth=0.5,
                           node_size=1)
-            logger.warn("Plotted_Graph")
         else:
             ox.plot_graph(self.graph,
                           save=True,
@@ -245,12 +201,12 @@ class OSMManipulator:
                           )
         logger.info(f'Saved osm xml to {OSM_OUTPUT_DIR}/{OSM_OUTPUT_FILENAME}.osm')
 
-    def add_osm_edge(self, from_id, to_id, maxspeed=None):
+    def add_osm_edge(self, from_id, to_id, name, maxspeed=None):
         if maxspeed:
             self.graph.add_edge(from_id, to_id,
                                 highway='pedestrian',
                                 lanes='1',
-                                name='Open Space',
+                                name=name,
                                 oneway=True,
                                 maxspeed=maxspeed, )
         else:
@@ -269,22 +225,19 @@ class OSMManipulator:
         self.current_osm_id += 1
         return self.current_osm_id
 
-    def set_nearest_point_to_entry(self, entry_point: EntryPoint):
-        nearest_edge = ox.get_nearest_edge(self.graph, entry_point.open_space_coord[::-1])
-        entry_point_shply = Point(*entry_point.open_space_coord)
-        nearest_point = nearest_points(entry_point_shply, nearest_edge[0])[1]
-        entry_point.graph_entry_node_coord = [nearest_point.x, nearest_point.y]
-        entry_point.graph_entry_edge = [nearest_edge[1], nearest_edge[2]]
+    def get_nearest_edge(self, coord):
+        return ox.get_nearest_edge(self.graph, coord[::-1])
 
     def get_coord_from_id(self, node_id):
         node = self.graph.node[node_id]
         return [node['x'], node['y']]
 
     def add_entry_edges(self, entry_points):
+        # TODO Move to GraphEntryPoint
         edges = len(self.graph.edges)
         for entry_point in entry_points:
             entry_point.nearest_graph_node_id = self.add_osm_node(entry_point.graph_entry_node_coord)
-            self.add_osm_edge(entry_point.graph_entry_edge[0], entry_point.nearest_graph_node_id)
-            self.add_osm_edge(entry_point.graph_entry_edge[1], entry_point.nearest_graph_node_id)
-            self.add_osm_edge(entry_point.nearest_graph_node_id, entry_point.open_space_node_id)
+            self.add_osm_edge(entry_point.graph_entry_edge[0], entry_point.nearest_graph_node_id, "test")
+            self.add_osm_edge(entry_point.graph_entry_edge[1], entry_point.nearest_graph_node_id, "test")
+            self.add_osm_edge(entry_point.nearest_graph_node_id, entry_point.open_space_node_id, "test")
         print(f'ADDED EDGES ENTRY: {len(self.graph.edges) - edges}')

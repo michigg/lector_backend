@@ -6,7 +6,7 @@ from indoor_mapper.utils.config_controller import IndoorMapperConfigController
 from indoor_mapper.utils.univis_room_controller import UnivISRoomController
 
 # from lector.utils.osmm import OSMManipulator as OSMUtils
-from lector.utils.open_space_models import OpenSpace
+from lector.utils.open_space_models import OpenSpace, GraphBuildingEntryPoint
 
 logger = logging.getLogger(__name__)
 
@@ -18,59 +18,25 @@ class IndoorMapController:
         self.graph_buildings = None
         self.osmm = osmm
 
-    # def get_buildings_for_open_space(self, open_space: OpenSpace):
-    #     bbox = open_space.get_boundaries()
-    #     buildings = []
-    #     for building in self.indoor_cc.buildings:
-    #         for staircase in building.staircases:
-    #             if bbox.max_lat > staircase.coord[0] > bbox.min_lat and bbox.max_lon > staircase[1] > bbox.min_lon:
-    #                 buildings.append(building)
-    #     return buildings
-
     def add_buildings_to_graph(self, buildings: List[GraphBuilding]):
         for building in buildings:
-            for staircase in building.graph_staircases:
-                not_blocked_entries = []
-                for entry_point in staircase.entries:
-                    if not staircase.is_blocked() and not entry_point.is_blocked():
-                        self.osmm.set_nearest_point_to_entry(entry_point)
-                        not_blocked_entries.append(entry_point)
-                self.osmm.add_entry_edges(not_blocked_entries)
-                if not staircase.is_blocked():
-                    self.add_staircase_edges(staircase)
-                for alternate_staircase in building.get_staircaise_neighbours(staircase):
-                    self.osmm.add_osm_edge(staircase.position_id, alternate_staircase.position_id, maxspeed=0.01)
-
-    def indoor_maps_to_graph(self) -> List[GraphBuilding]:
-        return self.get_graph_buildings(self.indoor_cc.buildings)
+            building.add_staircase_edges()
 
     def get_graph_buildings(self, buildings: List[Building]) -> List[GraphBuilding]:
-        graph_buildings = []
-        for building in buildings:
-            graph_stair_cases = []
-            for staircase in building.staircases:
-                position_id = self.osmm.add_osm_node(staircase.coord)
-                for entry in staircase.entries:
-                    entry.open_space_node_id = self.osmm.add_osm_node(entry.open_space_coord)
-                graph_stair_cases.append(GraphStairCase(staircase, position_id))
-            graph_buildings.append(GraphBuilding(building, graph_stair_cases))
-        return graph_buildings
+        return [GraphBuilding(self.osmm, building, self._get_graph_stair_cases(building)) for building in buildings]
 
-    def add_staircase_to_graph(self) -> List[GraphBuilding]:
-        graph_buildings = self.indoor_maps_to_graph()
-        for building in graph_buildings:
-            for staircase in building.graph_staircases:
-                for entry_point in staircase.entries:
-                    self.osmm.set_nearest_point_to_entry(entry_point)
-                self.osmm.add_entry_edges(staircase.entries)
-                self.add_staircase_edges(staircase)
-        return graph_buildings
+    def _get_graph_stair_cases(self, building) -> List[GraphStairCase]:
+        return [GraphStairCase(staircase, self.osmm.add_osm_node(staircase.coord), self._get_graph_entries(staircase))
+                for staircase in building.staircases]
+
+    def _get_graph_entries(self, staircase) -> List[GraphBuildingEntryPoint]:
+        return [GraphBuildingEntryPoint(entry, self.osmm) for entry in staircase.entries]
 
     def add_staircase_edges(self, staircase: GraphStairCase):
         edges = len(self.osmm.graph.edges)
-        for entry in staircase.entries:
+        for entry in staircase.graph_entries:
             if not entry.is_blocked():
-                self.osmm.add_osm_edge(staircase.position_id, entry.open_space_node_id)
+                self.osmm.add_osm_edge(staircase.position_id, entry.nearest_graph_node_id)
         print(f'ADDED EDGES STAIRCASE: {len(self.osmm.graph.edges) - edges}')
 
 
