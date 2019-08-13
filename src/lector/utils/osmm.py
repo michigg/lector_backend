@@ -106,7 +106,7 @@ class OSMManipulator:
         print(f'BUILDING {open_space.file_name}')
 
         open_space.set_buildings(buildings)
-        self.graph = self.download_map(open_space.get_boundaries(boundary_degree_extension=0.0007))
+        self.graph = self.download_map(open_space.get_boundaries(boundary_degree_extension=0.001))
 
         #  Remove other nodes
         bbox = open_space.get_boundaries()
