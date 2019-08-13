@@ -102,8 +102,6 @@ class OSMManipulator:
 
     def test4(self, open_space):
         buildings = self.indoor_map_c.indoor_cc.get_buildings()
-        self.graph = self.download_map()
-
         print("--------------------------------------------------------------------")
         print(f'BUILDING {open_space.file_name}')
 
