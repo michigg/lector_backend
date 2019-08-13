@@ -100,6 +100,40 @@ class OSMManipulator:
             self.add_entry_edges(graph_open_space.entry_points)
             # self.plot_graph(output_dir="/osm_data", file_name=graph_open_space.file_name, minimized=False)
 
+    def test4(self, open_space):
+        buildings = self.indoor_map_c.indoor_cc.get_buildings()
+        self.graph = self.download_map()
+
+        print("--------------------------------------------------------------------")
+        print(f'BUILDING {open_space.file_name}')
+
+        open_space.set_buildings(buildings)
+
+        #  Remove other nodes
+        bbox = open_space.get_boundaries()
+        nodes = [node for node, data in self.graph.nodes(data=True) if
+                 bbox.min_lon < data['x'] < bbox.max_lon and bbox.min_lat < data['y'] < bbox.max_lat]
+        for node in nodes:
+            self.graph.remove_node(node)
+
+        # Insert Building Nodes
+        graph_open_space = GraphOpenSpace(open_space, osmm=self)
+        graph_open_space.add_walkable_edges()
+        graph_open_space.add_restricted_area_edges()
+        graph_buildings = self.indoor_map_c.get_graph_buildings(graph_open_space.buildings)
+        self.indoor_map_c.add_buildings_to_graph(graph_buildings)
+        graph_open_space.remove_walkable_edges()
+        graph_open_space.remove_restricted_area_edges()
+        for building in graph_buildings:
+            for staircase in building.graph_staircases:
+                for entry in staircase.get_not_blocked_entries():
+                    graph_open_space.add_building_entry_to_open_space(entry)
+
+        # Generate Visibility graph
+        graph_open_space.add_visibility_graph_edges()
+        self.add_entry_edges(graph_open_space.entry_points)
+        # self.plot_graph(output_dir="/osm_data", file_name=graph_open_space.file_name, minimized=False)
+
     def test2(self):
         open_spaces = self.osp_c.osp_config_c.get_open_spaces()
         buildings = self.indoor_map_c.indoor_cc.get_buildings()
