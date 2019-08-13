@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 from indoor_mapper.utils.univis_models import Room
@@ -17,12 +18,15 @@ class Floor:
 
 
 class StairCase:
-    def __init__(self, name, floors: List[Floor], coord, entries: List[BuildingEntryPoint]):
+    def __init__(self, name, floors: List[Floor], coord, entries: List[BuildingEntryPoint], blocked=None,
+                 neighbours=None):
         self.name = name
         self.coord = coord
         self.entries = entries
         self.floors = floors
         self.rooms = []
+        self.blocked = blocked
+        self.neighbours = neighbours
 
     def add_room(self, room: Room):
         # TODO: better insert sort
@@ -35,6 +39,16 @@ class StairCase:
                 return True
         return False
 
+    def get_not_blocked_entries(self):
+        if self.is_blocked():
+            return []
+        return [entry for entry in self.entries if not entry.is_blocked()]
+
+    def is_blocked(self):
+        if self.blocked:
+            return datetime.now() > self.blocked
+        return False
+
     def __str__(self):
         output = f'Staircase {self.name}\n'
         for room in self.rooms:
@@ -44,7 +58,8 @@ class StairCase:
 
 class GraphStairCase(StairCase):
     def __init__(self, staircase: StairCase, position_id: int):
-        super().__init__(staircase.name, staircase.floors, staircase.coord, staircase.entries)
+        super().__init__(staircase.name, staircase.floors, staircase.coord, staircase.entries, staircase.blocked,
+                         staircase.neighbours)
         self.position_id = position_id
 
 
@@ -70,3 +85,12 @@ class GraphBuilding(Building):
     def __init__(self, building: Building, graph_staircases: List[GraphStairCase]):
         super().__init__(building.key, building.staircases)
         self.graph_staircases = graph_staircases
+
+    def get_staircaise_neighbours(self, staircase: StairCase):
+        if staircase.neighbours:
+            print("NEIGBOURS", [graph_staircase for graph_staircase in self.graph_staircases if
+                                graph_staircase.name in staircase.neighbours])
+            return [graph_staircase for graph_staircase in self.graph_staircases if
+                    graph_staircase.name in staircase.neighbours]
+        print("NO STAIRCASES")
+        return []

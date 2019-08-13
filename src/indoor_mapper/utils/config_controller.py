@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from datetime import datetime
 from typing import List
 
 from indoor_mapper.utils.building_models import Building, Floor, StairCase
@@ -12,7 +13,7 @@ logger = logging.getLogger(__name__)
 class IndoorMapperConfigController:
     def __init__(self, config_dir='/indoor_maps'):
         self.config_dir = config_dir
-        self.buildings = self._get_buildings()
+        self.buildings = self.get_buildings()
         logger.info(f'LOADED BUILDINGS {len(self.buildings)}')
 
     def _load_building_config(self, file='erba.json'):
@@ -23,7 +24,7 @@ class IndoorMapperConfigController:
     def _get_build_config_files(self):
         return [f for f in os.listdir(self.config_dir) if f.endswith('.json')]
 
-    def _get_buildings(self) -> List[Building]:
+    def get_buildings(self) -> List[Building]:
         return [self._get_building(self._load_building_config(file)) for file in self._get_build_config_files()]
 
     def _get_building(self, building: dict):
@@ -48,8 +49,19 @@ class IndoorMapperConfigController:
     def _get_staircase_name(staircase: dict):
         return staircase['name']
 
+    @staticmethod
+    def _get_blocked_date(staircase: dict) -> datetime or None:
+        if "blocked" in staircase:
+            return datetime.strptime(staircase['blocked'], "%Y-%m-%d")
+        return None
+
+    def _get_staircase_neigbours(self, staircase: dict):
+        return staircase.get("neighbours", None)
+
     def _get_staircase(self, staircase):
         return StairCase(self._get_staircase_name(staircase),
                          self._get_staircase_floors(staircase),
                          self._get_staircase_coord(staircase),
-                         self._get_staircase_entry_points(staircase))
+                         self._get_staircase_entry_points(staircase),
+                         self._get_blocked_date(staircase),
+                         self._get_staircase_neigbours(staircase))

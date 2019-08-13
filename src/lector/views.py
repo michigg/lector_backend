@@ -66,7 +66,7 @@ class ApiOpenSpaceInfos(views.APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST, headers={'access-control-allow-origin': '*'})
 
     def create_plot(self, open_space, osmm):
-        osmm.download_map(open_space.get_boundaries())
+        osmm.download_map(open_space.get_boundaries(boundary_degree_extension=0.0005))
         graph_open_space = osmm.osp_c.get_graph_open_space(open_space)
         osmm.add_custom_open_spaces_with_buildings(graph_open_space, [graph_open_space])
         osmm.plot_graph(settings.MEDIA_ROOT, graph_open_space.file_name, minimized=False)

@@ -147,7 +147,7 @@
         "stroke-opacity": 1,
         "fill": "#555555",
         "fill-opacity": 0.5,
-        "walkable": "False"
+        "restricted": "True"
       },
       "geometry": {
         "type": "Polygon",
@@ -270,6 +270,44 @@
         "coordinates": [
           10.883629024028778,
           49.8948728406991
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stroke": "#555555",
+        "stroke-width": 2,
+        "stroke-opacity": 1,
+        "fill": "#555555",
+        "fill-opacity": 0.5,
+        "blocked": "True"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              10.883331298828125,
+              49.89504562616936
+            ],
+            [
+              10.883403718471527,
+              49.89499551844668
+            ],
+            [
+              10.883521735668182,
+              49.895090550290284
+            ],
+            [
+              10.8834707736969,
+              49.89513720221772
+            ],
+            [
+              10.883331298828125,
+              49.89504562616936
+            ]
+          ]
         ]
       }
     }

@@ -28,25 +28,27 @@ class OpenSpaceConfigController:
         logger.info(f'FOUND {len(files)} geojsons')
         return [self.load_geojson(file) for file in files]
 
-    def _load_open_space(self, data: dict) -> OpenSpace:
+    def _load_open_space(self, data: dict) -> OpenSpace or None:
         walkables = []
         restricted = []
+        blocked = []
         entry_points = []
         for feature in data['geojson']['features']:
-            if "walkable" in feature['properties']:
-                if feature['properties']['walkable'] == 'True':
-                    walkables.append(feature['geometry']['coordinates'][0])
-                else:
-                    restricted.append(feature['geometry']['coordinates'][0])
+            polygon = feature['geometry']['coordinates'][0]
+            if "walkable" in feature['properties'] and feature['properties']['walkable'] == 'True':
+                walkables.append(polygon)
+            if "restricted" in feature['properties'] and feature['properties']['restricted'] == 'True':
+                restricted.append(polygon)
+            if "blocked" in feature['properties'] and feature['properties']['blocked'] == 'True':
+                blocked.append(polygon)
             if "entry" in feature['properties'] and feature['properties']['entry'] == "True":
                 entry_points.append(EntryPoint(feature['geometry']['coordinates']))
         if len(walkables) > 1:
             logger.warn(f'Multiple walkable areas detected. Only one walkable area for each config file is allowed!')
         if len(walkables) == 0:
             logger.error(f'No walkable area found! Area dismissed!')
-            return OpenSpace()
-        else:
-            return OpenSpace(data['file_name'], walkables[0], restricted, entry_points)
+            return None
+        return OpenSpace(data['file_name'], walkables[0], restricted, blocked, entry_points)
 
     def _load_open_spaces(self):
         return [self._load_open_space(geojson) for geojson in self._get_geojsons()]

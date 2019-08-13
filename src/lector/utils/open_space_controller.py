@@ -31,10 +31,10 @@ class OpenSpaceController:
         return GraphOpenSpace(open_space, self.osmm)
 
     def insert_open_space(self, open_space: OpenSpace):
-        logger.info(f'Insert Open Space')
+        logger.info(f'Insert Open Space {open_space.file_name}')
         logger.info(f'Graph Nodes: {len(self.osmm.graph)}')
         graph_open_space = GraphOpenSpace(open_space, self.osmm)
-        graph_open_space.add_visiblity_graph_edges()
+        graph_open_space.add_visibility_graph_edges()
         self.osmm.add_entry_edges(open_space.entry_points)
         # graph_open_space.add_walkable_edges()
         # graph_open_space.add_restricted_area_edges()

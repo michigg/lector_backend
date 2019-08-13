@@ -21,10 +21,9 @@ class Command(BaseCommand):
         logger = logging.getLogger('')
         logger.setLevel(logging.INFO)
         osmm = OSMManipulator()
-        osmm.add_open_spaces_with_staircases()
-        # osmm.add_indoor_maps()
         osmm.test3()
-        osmm.plot_graph()
+        # osmm.add_indoor_maps()
+        # osmm.plot_graph()
         osmm.save_graph()
 
         gh_docker_controller = DockerGraphhopperController(graphhopper_service_name=SERVICE_NAME,
