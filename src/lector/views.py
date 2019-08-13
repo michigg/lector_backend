@@ -68,4 +68,4 @@ class ApiOpenSpaceInfos(views.APIView):
     def create_plot(self, open_space, osmm):
         osmm.download_map(open_space.get_boundaries(boundary_degree_extension=0.0005))
         osmm.test4(open_space)
-        osmm.plot_graph(settings.MEDIA_ROOT, graph_open_space.file_name, minimized=False)
+        osmm.plot_graph(settings.MEDIA_ROOT, open_space.file_name, minimized=False)
