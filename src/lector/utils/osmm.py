@@ -5,7 +5,7 @@ import osmnx as ox
 
 from indoor_mapper.utils.indoor_mapper import IndoorMapController
 from lector.utils.graph_open_space_models import GraphOpenSpace
-from lector.utils.open_space_controller import OpenSpaceController
+from lector.utils.open_space_config_controller import OpenSpaceConfigController
 from lector.utils.open_space_models import BBox
 
 logger = logging.getLogger(__name__)
@@ -18,16 +18,18 @@ OSM_OUTPUT_FILENAME = "data"
 OSM_OUTPUT_DIR = "/osm_data"
 SERVICE_NAME = 'graphhopper'
 
+OPEN_SPACE_CONFIG_DIR = "/open_spaces"
+
 
 class OSMManipulator:
     def __init__(self):
         self.graph = None
         self.current_osm_id = 0
-        self.osp_c = OpenSpaceController(self)
+        self.osp_config_c = OpenSpaceConfigController(OPEN_SPACE_CONFIG_DIR)
         self.indoor_map_c = IndoorMapController(self)
 
     def test(self):
-        open_spaces = self.osp_c.osp_config_c.get_open_spaces()
+        open_spaces = self.osp_config_c.get_open_spaces()
         buildings = self.indoor_map_c.indoor_cc.get_buildings()
 
         for open_space in open_spaces:
