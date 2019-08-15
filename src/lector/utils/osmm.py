@@ -124,10 +124,12 @@ class OSMManipulator:
         self.indoor_map_c.add_buildings_to_graph(graph_buildings)
         graph_open_space.remove_walkable_edges()
         graph_open_space.remove_restricted_area_edges()
+        self.plot_graph(output_dir="/osm_data", file_name=f'{graph_open_space.file_name}_building_without_entry', minimized=False)
         for building in graph_buildings:
             for staircase in building.graph_staircases:
                 for entry in staircase.get_not_blocked_entries():
                     graph_open_space.add_building_entry_to_open_space(entry)
+        self.plot_graph(output_dir="/osm_data", file_name=f'{graph_open_space.file_name}_building', minimized=False)
 
     def _insert_open_space(self, buildings, open_space):
         open_space.set_buildings(buildings)
@@ -135,6 +137,7 @@ class OSMManipulator:
         # Insert Building Nodes
         self._insert_building_to_graph(graph_open_space)
         # Generate Visibility graph
-        graph_open_space.add_visibility_graph_edges()
+        # graph_open_space.add_visibility_graph_edges()
+        # graph_open_space.add_walkable_edges()
         graph_open_space.add_graph_entry_points()
         return graph_open_space

@@ -124,7 +124,7 @@ class GraphOpenSpace(OpenSpace):
 
     def add_building_entry_to_open_space(self, entry_point):
         if self.is_open_space_walkable_node(entry_point.graph_entry_edge[0]):
-            self.insert_sorted(entry_point.open_space_node_id, entry_point.graph_entry_edge[0],
+            self.insert_sorted(entry_point.nearest_graph_node_id, entry_point.graph_entry_edge[0],
                                self.walkable_area_nodes)
             self.walkable_area_poly = Polygon(
                 [[self.osmm.graph.node[node]['x'], self.osmm.graph.node[node]['y']] for node in
@@ -132,7 +132,7 @@ class GraphOpenSpace(OpenSpace):
             self.walkable_area_prep_poly = prep(self.walkable_area_poly)
         restricted_area_id = self.get_open_space_restricted_area_id(entry_point.graph_entry_edge[0])
         if self.get_open_space_restricted_area_id(entry_point.graph_entry_edge[0]) > -1:
-            self.insert_sorted(entry_point.open_space_node_id, entry_point.graph_entry_edge[0],
+            self.insert_sorted(entry_point.nearest_graph_node_id, entry_point.graph_entry_edge[0],
                                self.restricted_areas_nodes[restricted_area_id])
             self.restricted_area_polys[restricted_area_id] = Polygon(
                 [[self.osmm.graph.node[node]['x'], self.osmm.graph.node[node]['y']] for node in

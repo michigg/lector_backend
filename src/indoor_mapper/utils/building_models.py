@@ -46,7 +46,7 @@ class StairCase:
 
     def is_blocked(self):
         if self.blocked:
-            return datetime.now() > self.blocked
+            return datetime.now() < self.blocked
         return False
 
     def __str__(self):
@@ -101,15 +101,14 @@ class GraphBuilding(Building):
 
     def add_staircase_edges(self):
         for graph_staircase in self.graph_staircases:
-            not_blocked_entries = []
-            for graph_entry in graph_staircase.graph_entries:
-                if not graph_entry.is_blocked():
-                    not_blocked_entries.append(graph_entry)
-
+            print(self.graph_staircases)
             if not graph_staircase.is_blocked():
                 for entry in graph_staircase.graph_entries:
                     if not entry.is_blocked():
                         self.osmm.add_osm_edge(graph_staircase.position_id, entry.nearest_graph_node_id, self.key)
+                        entry.add_edges()
             for alternate_staircase in self.get_staircaise_neighbours(graph_staircase):
-                self.osmm.add_osm_edge(graph_staircase.position_id, alternate_staircase.position_id, maxspeed=0.01,
+                self.osmm.add_osm_edge(graph_staircase.position_id,
+                                       alternate_staircase.position_id,
+                                       maxspeed=0.01,
                                        name=self.key)

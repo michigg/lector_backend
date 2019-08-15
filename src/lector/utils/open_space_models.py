@@ -21,7 +21,7 @@ class GraphEntryPoint(EntryPoint):
     def __init__(self, entry_point: EntryPoint, osmm):
         super().__init__(coord=entry_point.open_space_coord)
         self.osmm = osmm
-        self.open_space_node_id = self.osmm.add_osm_node(self.open_space_coord)
+        # self.open_space_node_id = self.osmm.add_osm_node(self.open_space_coord)
         self.open_space_point = Point(*self.open_space_coord)
         self.graph_entry_node_coord = None
         self.graph_entry_edge = None
@@ -36,9 +36,9 @@ class GraphEntryPoint(EntryPoint):
         self.graph_entry_edge = [nearest_edge[1], nearest_edge[2]]
 
     def add_edges(self):
-        self.osmm.add_osm_edge(self.graph_entry_edge[0], self.nearest_graph_node_id, "Test")
-        self.osmm.add_osm_edge(self.graph_entry_edge[1], self.nearest_graph_node_id, "Test")
-        self.osmm.add_osm_edge(self.open_space_node_id, self.nearest_graph_node_id, "Test")
+        self.osmm.add_osm_edge(self.graph_entry_edge[0], self.nearest_graph_node_id, "Eingang")
+        self.osmm.add_osm_edge(self.graph_entry_edge[1], self.nearest_graph_node_id, "Eingang")
+        # self.osmm.add_osm_edge(self.open_space_node_id, self.nearest_graph_node_id, "Eingang")
 
 
 class OpenSpaceEntryPoint(EntryPoint):
@@ -56,7 +56,7 @@ class BuildingEntryPoint(EntryPoint):
 
     def is_blocked(self):
         if self.blocked:
-            return datetime.now() > self.blocked
+            return datetime.now() < self.blocked
         return False
 
     def __str__(self):

@@ -26,18 +26,12 @@ class IndoorMapController:
         return [GraphBuilding(self.osmm, building, self._get_graph_stair_cases(building)) for building in buildings]
 
     def _get_graph_stair_cases(self, building) -> List[GraphStairCase]:
+        print(building.key, building.staircases)
         return [GraphStairCase(staircase, self.osmm.add_osm_node(staircase.coord), self._get_graph_entries(staircase))
                 for staircase in building.staircases]
 
     def _get_graph_entries(self, staircase) -> List[GraphBuildingEntryPoint]:
         return [GraphBuildingEntryPoint(entry, self.osmm) for entry in staircase.entries]
-
-    def add_staircase_edges(self, staircase: GraphStairCase):
-        edges = len(self.osmm.graph.edges)
-        for entry in staircase.graph_entries:
-            if not entry.is_blocked():
-                self.osmm.add_osm_edge(staircase.position_id, entry.nearest_graph_node_id)
-        print(f'ADDED EDGES STAIRCASE: {len(self.osmm.graph.edges) - edges}')
 
 
 class RoomStaircaseController:
