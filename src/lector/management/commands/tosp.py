@@ -23,9 +23,9 @@ class Command(BaseCommand):
         osmm = OSMManipulator()
         osmm.create_seperate_open_spaces_plots()
         # osmm.create_bbox_open_spaces_plot()
-        #
-        # gh_docker_controller = DockerGraphhopperController(graphhopper_service_name=SERVICE_NAME,
-        #                                                    osm_output_dir=OSM_OUTPUT_DIR,
-        #                                                    osm_output_filename=OSM_OUTPUT_FILENAME)
-        # gh_docker_controller.clean_graphhopper_restart()
+
+        gh_docker_controller = DockerGraphhopperController(graphhopper_service_name=SERVICE_NAME,
+                                                           osm_output_dir=OSM_OUTPUT_DIR,
+                                                           osm_output_filename=OSM_OUTPUT_FILENAME)
+        gh_docker_controller.clean_graphhopper_restart()
         logger.setLevel(logging.WARNING)

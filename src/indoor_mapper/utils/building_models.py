@@ -101,7 +101,6 @@ class GraphBuilding(Building):
 
     def add_staircase_edges(self):
         for graph_staircase in self.graph_staircases:
-            print(self.graph_staircases)
             if not graph_staircase.is_blocked():
                 for entry in graph_staircase.graph_entries:
                     if not entry.is_blocked():

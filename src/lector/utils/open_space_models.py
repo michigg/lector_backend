@@ -1,7 +1,7 @@
+import logging
+import math
 from datetime import datetime
 from typing import List
-
-import logging
 
 from shapely.geometry import Point
 from shapely.ops import nearest_points
@@ -21,7 +21,6 @@ class GraphEntryPoint(EntryPoint):
     def __init__(self, entry_point: EntryPoint, osmm):
         super().__init__(coord=entry_point.open_space_coord)
         self.osmm = osmm
-        # self.open_space_node_id = self.osmm.add_osm_node(self.open_space_coord)
         self.open_space_point = Point(*self.open_space_coord)
         self.graph_entry_node_coord = None
         self.graph_entry_edge = None
@@ -38,7 +37,6 @@ class GraphEntryPoint(EntryPoint):
     def add_edges(self):
         self.osmm.add_osm_edge(self.graph_entry_edge[0], self.nearest_graph_node_id, "Eingang")
         self.osmm.add_osm_edge(self.graph_entry_edge[1], self.nearest_graph_node_id, "Eingang")
-        # self.osmm.add_osm_edge(self.open_space_node_id, self.nearest_graph_node_id, "Eingang")
 
 
 class OpenSpaceEntryPoint(EntryPoint):
@@ -114,7 +112,23 @@ class GraphBuildingEntryPoint(BuildingEntryPoint, GraphEntryPoint):
 
 
 class GraphOpenSpaceEntryPoint(OpenSpaceEntryPoint, GraphEntryPoint):
-    def __init__(self, entry_point: OpenSpaceEntryPoint, osmm):
+    def __init__(self, entry_point: OpenSpaceEntryPoint, osmm, open_space):
         self.open_space_coord = entry_point.open_space_coord
         print(self.open_space_coord)
         GraphEntryPoint.__init__(self, entry_point=entry_point, osmm=osmm)
+        self.open_space_node = self._set_open_space_entry_point(open_space)
+
+    def _set_open_space_entry_point(self, open_space):
+        node_distance_list = []
+        for node in open_space.get_all_nodes():
+            coord = self.osmm.get_coord_from_id(node)
+            distance = math.sqrt(
+                math.pow(self.open_space_coord[0] - coord[0], 2) + math.pow(self.open_space_coord[1] - coord[1], 2))
+            node_distance_list.append({"distance": distance, "node": node})
+        return min(node_distance_list, key=lambda elem: elem['distance'])['node']
+
+    def add_edges(self):
+        self.osmm.add_osm_edge(self.graph_entry_edge[0], self.nearest_graph_node_id, "Zugang Freifläche")
+        self.osmm.add_osm_edge(self.graph_entry_edge[1], self.nearest_graph_node_id, "Zugang Freifläche")
+        self.osmm.add_osm_edge(self.open_space_node, self.nearest_graph_node_id,
+                               "Zugang Freifläche")

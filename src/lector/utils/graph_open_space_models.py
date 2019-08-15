@@ -91,7 +91,7 @@ class GraphOpenSpace(OpenSpace):
         return self.is_restricted_line(line, other_restricted_areas)
 
     def add_visibility_graph_edges(self):
-        nodes = self._get_all_nodes()
+        nodes = self.get_all_nodes()
         for node_from in nodes:
             for node_to in nodes:
                 if node_from < node_to:
@@ -145,16 +145,16 @@ class GraphOpenSpace(OpenSpace):
                 return
 
     def _set_node_ids(self):
-        self.graph_entry_points = [GraphOpenSpaceEntryPoint(entry_point, self.osmm) for entry_point in
-                                   self.entry_points]
-        # self.osmm.set_nearest_point_to_entry(entry_point)
 
         # Set Walkable Area Nodes
         self.walkable_area_nodes = [self.osmm.add_osm_node(point) for point in self.walkable_area_coords]
 
+        self.graph_entry_points = [GraphOpenSpaceEntryPoint(entry_point, self.osmm, self) for entry_point in
+                                   self.entry_points]
+
         #   Set Entry Point to Open Space
-        for entry_point in self.graph_entry_points:
-            entry_point.open_space_node_id = ox.get_nearest_node(self.osmm.graph, entry_point.open_space_coord[::-1])
+        # for entry_point in self.graph_entry_points:
+        #     entry_point.open_space_node_id = ox.get_nearest_node(self.osmm.graph, entry_point.open_space_coord[::-1])
         # Set Restricted Area Nodes
         for restricted_area_coords in self.restricted_areas_coords:
             self.restricted_areas_nodes.append([self.osmm.add_osm_node(coord) for coord in restricted_area_coords])
@@ -183,7 +183,7 @@ class GraphOpenSpace(OpenSpace):
         self.osmm.graph.remove_edge(nodes[0], nodes[-1])
 
     # Better naming all nodes without blocked space
-    def _get_all_nodes(self) -> List[int]:
+    def get_all_nodes(self) -> List[int]:
         nodes = []
         nodes.extend(self.walkable_area_nodes)
         for restricted_area_nodes in self.restricted_areas_nodes:
@@ -207,12 +207,9 @@ class GraphOpenSpace(OpenSpace):
         ax = fig.add_subplot(1, 1, 1)
 
         # Plot y vs x as well as z vs x. label will be used by ax.legend() method to generate a legend automatically
-        print("Graph Walkable: ", self.walkable_area_poly)
         ax.plot(*self.walkable_area_poly.exterior.xy, label='poly')
         for restricted_poly in self.restricted_area_polys:
             ax.plot(*restricted_poly.exterior.xy, label='restricted')
-            print("Graph Walkable: ", restricted_poly)
-
         ax.set_title('Polys')
         handles, labels = ax.get_legend_handles_labels()
         lgd = ax.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, -0.1))
