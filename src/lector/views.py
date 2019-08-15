@@ -48,15 +48,14 @@ class ApiOpenSpaceInfos(views.APIView):
         file_name = request.GET.get('file_name', None)
         if file_name:
             osmm = OSMManipulator()
-            open_space = osmm.osp_c.osp_config_c.get_open_space(file_name)
-            logger.warn(open_space)
+            open_space = osmm.osp_config_c.get_open_space(file_name)
             try:
                 timestamp = os.path.getctime(f'{settings.MEDIA_ROOT}/{open_space.file_name}.svg')
                 creation_time = datetime.datetime.fromtimestamp(timestamp, tz=timezone.get_current_timezone())
                 max_creation_time = timezone.localtime(timezone.now()) - datetime.timedelta(hours=2)
 
                 if creation_time < max_creation_time:
-                    self.create_plot(open_space, osmm)
+                    osmm.create_open_space_plot(open_space)
             except FileNotFoundError as err:
                 self.create_plot(open_space, osmm)
 
@@ -64,7 +63,3 @@ class ApiOpenSpaceInfos(views.APIView):
                             status=status.HTTP_200_OK, headers={'access-control-allow-origin': '*'})
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST, headers={'access-control-allow-origin': '*'})
-
-    def create_plot(self, open_space, osmm):
-        osmm.test4(open_space)
-        osmm.plot_graph(settings.MEDIA_ROOT, open_space.file_name, minimized=False)

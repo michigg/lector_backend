@@ -30,6 +30,8 @@ class GraphOpenSpace(OpenSpace):
         self.graph_entry_points = []
 
         self.edges = []
+        #  Remove other nodes
+        self.remove_open_space_nodes()
         self._set_node_ids()
 
     def is_open_space_walkable_node(self, node_id) -> bool:
@@ -160,6 +162,7 @@ class GraphOpenSpace(OpenSpace):
         # Set Blocked Areas
         for blocked_area_coords in self.blocked_areas_nodes:
             self.blocked_areas_nodes.append([self.osmm.add_osm_node(coord) for coord in blocked_area_coords])
+
     def get_name(self):
         os.path.basename(self.file_name)
 
@@ -186,6 +189,17 @@ class GraphOpenSpace(OpenSpace):
         for restricted_area_nodes in self.restricted_areas_nodes:
             nodes.extend(restricted_area_nodes)
         return nodes
+
+    def remove_open_space_nodes(self):
+        bbox = self.get_boundaries()
+        nodes = [node for node, data in self.osmm.graph.nodes(data=True) if
+                 bbox.min_lon < data['x'] < bbox.max_lon and bbox.min_lat < data['y'] < bbox.max_lat]
+        for node in nodes:
+            self.osmm.graph.remove_node(node)
+
+    def add_graph_entry_points(self):
+        for graph_entry_point in self.graph_entry_points:
+            graph_entry_point.add_edges()
 
     def plot_areas(self):
         import matplotlib.pyplot as plt

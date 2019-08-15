@@ -21,9 +21,7 @@ class Command(BaseCommand):
         logger = logging.getLogger('')
         logger.setLevel(logging.INFO)
         osmm = OSMManipulator()
-        # osmm.add_open_spaces_with_staircases()
-        # osmm.add_indoor_maps()
-        osmm.test3()
+        osmm.create_bbox_open_spaces_plot()
         osmm.plot_graph()
         osmm.save_graph()
 
