@@ -1,23 +1,23 @@
-import time
 from enum import Enum
 from typing import List
+
 from django.utils import timezone
 
+from building_controller.utils.building_models import Room
 
-class Room:
+
+class UnivISRoom(Room):
     def __init__(self, univis_room):
-        self.univis_key = univis_room['@key']
-        self.building_key = None
-        self.number = None
-        self.level = None
-        self._init_room_number(univis_room)
+        building_key, level, number = self._init_room_number(univis_room)
+        Room.__init__(self, building_key, level, number)
 
-    def _init_room_number(self, univis_room):
+    def _init_room_number(self, univis_room) -> (str, int, int):
         splitted_room_id = str(univis_room['short']).split('/')
         splitted_room_number = splitted_room_id[1].split('.')
-        self.building_key = splitted_room_id[0]
-        self.level = int(splitted_room_number[0])
-        self.number = int(splitted_room_number[1])
+        building_key = splitted_room_id[0]
+        level = int(splitted_room_number[0])
+        number = int(splitted_room_number[1])
+        return building_key, level, number
 
     def __str__(self):
         return f'{self.building_key}/{self.level:02d}.{self.number:03d}'
@@ -52,7 +52,7 @@ class LectureType(Enum):
 
 
 class LectureTerm:
-    def __init__(self, univis_term: dict, rooms: List[Room]):
+    def __init__(self, univis_term: dict, rooms: List[UnivISRoom]):
         self.starttime = timezone.datetime.strptime(univis_term.get('starttime'), '%H:%M')
         self.endtime = timezone.datetime.strptime(univis_term.get('endtime'), '%H:%M')
         self.repeat = univis_term.get('repeat')
@@ -60,8 +60,7 @@ class LectureTerm:
 
 
 class Lecture:
-    def __init__(self, univis_lecture: dict, rooms: List[Room]):
-        print(univis_lecture)
+    def __init__(self, univis_lecture: dict, rooms: List[UnivISRoom]):
         terms = [term[1] for term in list(univis_lecture['terms'].items())][0]
         if type(terms) is list:
             terms = [dict(term) for term in terms]

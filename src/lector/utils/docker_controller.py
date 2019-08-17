@@ -3,6 +3,10 @@ import shutil
 
 import docker
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class DockerController:
     @staticmethod
@@ -16,7 +20,7 @@ class DockerController:
 
     def restart_container_by_service_name(self, service_name):
         container = self.get_container_by_service_name(service_name)
-        # TODO logging if container is not running
+
         if container:
             container.restart()
 
@@ -28,6 +32,7 @@ class DockerGraphhopperController(DockerController):
         self.osm_output_filename = osm_output_filename
 
     def clean_graphhopper_restart(self):
+        logger.info("Restart Graphhopper Container")
         self._remove_current_graphhopper_data()
         self.restart_container_by_service_name(self.graphhopper_service_name)
 

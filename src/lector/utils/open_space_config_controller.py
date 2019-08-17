@@ -42,7 +42,6 @@ class OpenSpaceConfigController:
             polygon = feature['geometry']['coordinates'][0]
             if "type" in feature['properties']:
                 type = feature['properties']['type'].lower()
-                print(type)
                 if type == WALKABLE_TYPE.lower():
                     walkables.append(polygon)
                 if type == RESTRICTED_TYPE.lower():

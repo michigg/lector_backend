@@ -1,12 +1,11 @@
+import logging
 from typing import List
 
 import requests
 import xmltodict
 from django.utils import timezone
 
-from lecture_room_service.utils.univis_models import Room, Lecture, Person
-
-import logging
+from lecture_room_service.utils.univis_models import UnivISRoom, Lecture, Person
 
 logger = logging.getLogger(__name__)
 
@@ -22,14 +21,14 @@ class UnivISLectureController:
     def load_page(self, url: str):
         return xmltodict.parse(requests.get(url).content)
 
-    def get_rooms(self, data: dict) -> List[Room]:
+    def get_rooms(self, data: dict) -> List[UnivISRoom]:
         rooms = []
         if 'Room' in data['UnivIS']:
             if type(data['UnivIS']['Room']) is list:
                 for room in data['UnivIS']['Room']:
-                    rooms.append(Room(room))
+                    rooms.append(UnivISRoom(room))
             else:
-                rooms.append(Room(data['UnivIS']['Room']))
+                rooms.append(UnivISRoom(data['UnivIS']['Room']))
         return rooms
 
     def get_persons(self, data: dict) -> List[Person]:
@@ -39,7 +38,7 @@ class UnivISLectureController:
                 persons.append(Person(person))
         return persons
 
-    def get_lectures(self, data: dict, rooms: List[Room]) -> List[Lecture]:
+    def get_lectures(self, data: dict, rooms: List[UnivISRoom]) -> List[Lecture]:
         lectures = []
         if 'Lecture' in data['UnivIS']:
             if type(data['UnivIS']['Lecture']) is list:
@@ -74,9 +73,7 @@ class UnivISLectureController:
                 lecture.lecturers = new_lecturers
                 clean_lectures.append(lecture)
 
-        for lecture in clean_lectures:
-            print(lecture)
-        print(f'FOUND LECTURES {len(clean_lectures)}')
+        logger.info(f'FOUND LECTURES {len(clean_lectures)}')
         return clean_lectures
 
     def get_lectures_split_by_date(self, lectures):

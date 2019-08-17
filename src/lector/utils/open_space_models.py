@@ -114,7 +114,6 @@ class GraphBuildingEntryPoint(BuildingEntryPoint, GraphEntryPoint):
 class GraphOpenSpaceEntryPoint(OpenSpaceEntryPoint, GraphEntryPoint):
     def __init__(self, entry_point: OpenSpaceEntryPoint, osmm, open_space):
         self.open_space_coord = entry_point.open_space_coord
-        print(self.open_space_coord)
         GraphEntryPoint.__init__(self, entry_point=entry_point, osmm=osmm)
         self.open_space_node = self._set_open_space_entry_point(open_space)
 

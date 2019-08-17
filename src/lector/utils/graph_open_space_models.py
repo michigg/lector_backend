@@ -1,7 +1,6 @@
 import os
 from typing import List
 
-import osmnx as ox
 from shapely.geometry import Polygon, LineString
 from shapely.prepared import prep
 
@@ -152,9 +151,6 @@ class GraphOpenSpace(OpenSpace):
         self.graph_entry_points = [GraphOpenSpaceEntryPoint(entry_point, self.osmm, self) for entry_point in
                                    self.entry_points]
 
-        #   Set Entry Point to Open Space
-        # for entry_point in self.graph_entry_points:
-        #     entry_point.open_space_node_id = ox.get_nearest_node(self.osmm.graph, entry_point.open_space_coord[::-1])
         # Set Restricted Area Nodes
         for restricted_area_coords in self.restricted_areas_coords:
             self.restricted_areas_nodes.append([self.osmm.add_osm_node(coord) for coord in restricted_area_coords])

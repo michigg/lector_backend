@@ -3,7 +3,7 @@ from typing import List
 import requests
 import xmltodict
 
-from building_controller.utils.univis_models import Room
+from lecture_room_service.utils.univis_models import UnivISRoom
 
 
 class UnivISRoomController:
@@ -18,15 +18,15 @@ class UnivISRoomController:
         return xmltodict.parse(requests.get(url).content)
 
     @staticmethod
-    def get_rooms_with_same_key(data: dict, key: str) -> List[Room]:
+    def get_rooms_with_same_key(data: dict, key: str) -> List[UnivISRoom]:
         if 'Room' not in data['UnivIS']:
             return []
-        return [Room(room) for room in data['UnivIS']['Room'] if str(f'{key}/').lower() in room['short'].lower()]
+        return [UnivISRoom(room) for room in data['UnivIS']['Room'] if str(f'{key}/').lower() in room['short'].lower()]
 
-    def get_rooms(self, data: dict) -> List[Room]:
+    def get_rooms(self, data: dict) -> List[UnivISRoom]:
         if 'Room' not in data['UnivIS']:
             return []
-        return [Room(room) for room in data['UnivIS']['Room'] if not self.is_a_room_group(room)]
+        return [UnivISRoom(room) for room in data['UnivIS']['Room'] if not self.is_a_room_group(room)]
 
     def is_a_room_group(self, room: dict):
         room_group_indicators = ['Raumgruppe', 'PR_']
@@ -40,10 +40,10 @@ class UnivISRoomController:
         # TODO change to Person class
         return [person for person in data['UnivIS']['Person']]
 
-    def get_rooms_by_building_key(self, building_key) -> List[Room]:
+    def get_rooms_by_building_key(self, building_key) -> List[UnivISRoom]:
         data = self.loadPage(self._get_univis_api_url(building_key))
         return self.get_rooms_with_same_key(data, building_key)
 
-    def get_rooms_by_token(self, token) -> List[Room]:
+    def get_rooms_by_token(self, token) -> List[UnivISRoom]:
         data = self.loadPage(self._get_univis_api_url(token))
         return self.get_rooms(data)

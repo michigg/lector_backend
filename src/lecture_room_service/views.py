@@ -1,20 +1,17 @@
 # Create your views here.
-from datetime import datetime
 
-from django.utils import timezone
+import logging
+
 from rest_framework import views, status
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
+from building_controller.utils.building_models import Room
 from building_controller.utils.indoor_mapper import RoomStaircaseController
-from building_controller.utils.univis_models import MinimalRoom
-from lecture_room_service.serializer import LectureSerializer, LonLatSerializer, RoomSerializer, \
+from lecture_room_service.serializer import LonLatSerializer, RoomSerializer, \
     SplittedLectureSerializer
 from lecture_room_service.utils.univis_lecture_controller import UnivISLectureController
-
-import logging
-
 from lecture_room_service.utils.univis_room_controller import UnivISRoomController
 
 logger = logging.getLogger(__name__)
@@ -68,8 +65,7 @@ class ApiRoomCoord(views.APIView):
         number = request.GET.get('number', None)
         if building and level and number:
             room_staircase_c = RoomStaircaseController()
-            staircase = room_staircase_c.get_rooms_staircase(MinimalRoom(building, level, number))
-            logger.warn(staircase)
+            staircase = room_staircase_c.get_rooms_staircase(Room(building, level, number))
             if staircase:
                 result = LonLatSerializer({'longitude': staircase.coord[0], 'latitude': staircase.coord[1]},
                                           many=False).data

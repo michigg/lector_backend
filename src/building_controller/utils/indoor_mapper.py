@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from building_controller.utils.building_models import GraphStairCase, GraphBuilding, StairCase, Building
+from building_controller.utils.building_models import GraphStairCase, GraphBuilding, StairCase, Building, Room
 from building_controller.utils.config_controller import IndoorMapperConfigController
 from lector.utils.open_space_models import GraphBuildingEntryPoint
 
@@ -22,7 +22,6 @@ class IndoorMapController:
         return [GraphBuilding(self.osmm, building, self._get_graph_stair_cases(building)) for building in buildings]
 
     def _get_graph_stair_cases(self, building) -> List[GraphStairCase]:
-        print(building.key, building.staircases)
         return [GraphStairCase(staircase, self.osmm.add_osm_node(staircase.coord), self._get_graph_entries(staircase))
                 for staircase in building.staircases]
 
@@ -34,11 +33,9 @@ class RoomStaircaseController:
     def __init__(self):
         self.indoor_cc = IndoorMapperConfigController()
 
-    def get_rooms_staircase(self, room, wheelchair=False) -> StairCase or None:
+    def get_rooms_staircase(self, room: Room, wheelchair=False) -> StairCase or None:
         for building in self.indoor_cc.buildings:
             # TODO: Add wheelchair option
             if str(building.key).lower() == str(room.building_key).lower():
-                staircase = building.get_rooms_staircase(room)
-                if staircase and not wheelchair:
-                    return staircase
+                return building.get_rooms_staircase(room)
         return None

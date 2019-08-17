@@ -1,8 +1,17 @@
 from datetime import datetime
 from typing import List
 
-from building_controller.utils.univis_models import Room
-from lector.utils.open_space_models import EntryPoint, BuildingEntryPoint, GraphBuildingEntryPoint
+from lector.utils.open_space_models import BuildingEntryPoint, GraphBuildingEntryPoint
+
+
+class Room:
+    def __init__(self, building_key=None, level=None, number=None):
+        self.building_key = building_key
+        self.number = int(number)
+        self.level = int(level)
+
+    def __str__(self):
+        return f'{self.building_key}/{self.level:02d}.{self.number:03d}'
 
 
 class Floor:
