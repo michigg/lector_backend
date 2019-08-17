@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'indoor_mapper',
     'lecture_room_service',
     'lector',
+    'vgn'
 ]
 
 MIDDLEWARE = [

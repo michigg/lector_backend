@@ -22,5 +22,6 @@ urlpatterns = [
                   path('admin/', admin.site.urls),
                   path('api/v1/', include('lector.urls')),
                   path('api/v1/', include('lecture_room_service.urls')),
+                  path('api/v1/', include('vgn.urls')),
                   path('api-auth/', include('rest_framework.urls')),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
