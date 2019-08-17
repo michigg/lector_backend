@@ -10,6 +10,7 @@ class UnivISRoom(Room):
     def __init__(self, univis_room):
         building_key, level, number = self._init_room_number(univis_room)
         Room.__init__(self, building_key, level, number)
+        self.univis_key = univis_room['@key']
 
     def _init_room_number(self, univis_room) -> (str, int, int):
         splitted_room_id = str(univis_room['short']).split('/')
