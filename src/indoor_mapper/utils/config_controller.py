@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class IndoorMapperConfigController:
-    def __init__(self, config_dir='/indoor_maps'):
+    def __init__(self, config_dir='/configs/indoor_maps'):
         self.config_dir = config_dir
         self.buildings = self.get_buildings()
         logger.info(f'LOADED BUILDINGS {len(self.buildings)}')

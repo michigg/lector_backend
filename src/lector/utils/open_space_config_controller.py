@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class OpenSpaceConfigController:
-    def __init__(self, config_dir='/open_spaces'):
+    def __init__(self, config_dir='/configs/open_spaces'):
         self.config_dir = config_dir
         self.open_spaces = self._load_open_spaces()
         logger.info(f'LOADED OPEN SPACES {len(self.open_spaces)}')

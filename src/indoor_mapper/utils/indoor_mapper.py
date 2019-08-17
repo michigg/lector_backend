@@ -38,15 +38,11 @@ class RoomStaircaseController:
     def __init__(self):
         self.indoor_cc = IndoorMapperConfigController()
 
-    def get_rooms_staircase(self, room) -> StairCase or None:
+    def get_rooms_staircase(self, room, wheelchair=False) -> StairCase or None:
         for building in self.indoor_cc.buildings:
+            # TODO: Add wheelchair option
             if str(building.key).lower() == str(room.building_key).lower():
-                logger.warn(building)
                 staircase = building.get_rooms_staircase(room)
-                if staircase:
+                if staircase and not wheelchair:
                     return staircase
         return None
-
-    def print_buildings(self):
-        for building in self.indoor_cc.buildings:
-            print(building)
