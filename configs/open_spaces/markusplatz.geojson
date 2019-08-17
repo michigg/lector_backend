@@ -9,7 +9,7 @@
         "stroke-opacity": 1,
         "fill": "#555555",
         "fill-opacity": 0.5,
-        "walkable": "True"
+        "type": "WALKABLE"
       },
       "geometry": {
         "type": "Polygon",
@@ -147,7 +147,7 @@
         "stroke-opacity": 1,
         "fill": "#555555",
         "fill-opacity": 0.5,
-        "restricted": "True"
+        "type": "RESTRICTED"
       },
       "geometry": {
         "type": "Polygon",
@@ -199,7 +199,7 @@
         "marker-color": "#7e7e7e",
         "marker-size": "medium",
         "marker-symbol": "",
-        "entry": "True"
+        "type": "ENTRY"
       },
       "geometry": {
         "type": "Point",
@@ -215,7 +215,7 @@
         "marker-color": "#7e7e7e",
         "marker-size": "medium",
         "marker-symbol": "",
-        "entry": "True"
+        "type": "ENTRY"
       },
       "geometry": {
         "type": "Point",
@@ -231,7 +231,7 @@
         "marker-color": "#7e7e7e",
         "marker-size": "medium",
         "marker-symbol": "",
-        "entry": "True"
+        "type": "ENTRY"
       },
       "geometry": {
         "type": "Point",
@@ -247,7 +247,7 @@
         "marker-color": "#7e7e7e",
         "marker-size": "medium",
         "marker-symbol": "",
-        "entry": "True"
+        "type": "ENTRY"
       },
       "geometry": {
         "type": "Point",
@@ -263,7 +263,7 @@
         "marker-color": "#7e7e7e",
         "marker-size": "medium",
         "marker-symbol": "",
-        "entry": "True"
+        "type": "ENTRY"
       },
       "geometry": {
         "type": "Point",

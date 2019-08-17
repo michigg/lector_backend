@@ -9,7 +9,7 @@
         "stroke-opacity": 1,
         "fill": "#555555",
         "fill-opacity": 0.5,
-        "walkable": "True"
+        "type": "WALKABLE"
       },
       "geometry": {
         "type": "Polygon",
@@ -207,7 +207,7 @@
         "stroke-opacity": 1,
         "fill": "#555555",
         "fill-opacity": 0.5,
-        "walkable": "False"
+        "type": "RESTRICTED"
       },
       "geometry": {
         "type": "Polygon",
@@ -245,7 +245,7 @@
         "stroke-opacity": 1,
         "fill": "#555555",
         "fill-opacity": 0.5,
-        "walkable": "False"
+        "type": "RESTRICTED"
       },
       "geometry": {
         "type": "Polygon",
@@ -283,7 +283,7 @@
         "stroke-opacity": 1,
         "fill": "#555555",
         "fill-opacity": 0.5,
-        "walkable": "False"
+        "type": "RESTRICTED"
       },
       "geometry": {
         "type": "Polygon",
@@ -315,7 +315,14 @@
     },
     {
       "type": "Feature",
-      "properties": {},
+      "properties": {
+        "stroke": "#555555",
+        "stroke-width": 2,
+        "stroke-opacity": 1,
+        "fill": "#555555",
+        "fill-opacity": 0.5,
+        "type": "RESTRICTED"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -356,7 +363,7 @@
         "stroke-opacity": 1,
         "fill": "#555555",
         "fill-opacity": 0.5,
-        "walkable": "False"
+        "type": "RESTRICTED"
       },
       "geometry": {
         "type": "Polygon",
@@ -394,7 +401,7 @@
         "stroke-opacity": 1,
         "fill": "#555555",
         "fill-opacity": 0.5,
-        "walkable": "False"
+        "type": "RESTRICTED"
       },
       "geometry": {
         "type": "Polygon",
@@ -432,7 +439,7 @@
         "stroke-opacity": 1,
         "fill": "#555555",
         "fill-opacity": 0.5,
-        "walkable": "False"
+        "type": "RESTRICTED"
       },
       "geometry": {
         "type": "Polygon",
@@ -468,7 +475,7 @@
         "marker-color": "#7e7e7e",
         "marker-size": "medium",
         "marker-symbol": "",
-        "entry": "True"
+        "type": "ENTRY"
       },
       "geometry": {
         "type": "Point",
@@ -484,7 +491,7 @@
         "marker-color": "#7e7e7e",
         "marker-size": "medium",
         "marker-symbol": "",
-        "entry": "True"
+        "type": "ENTRY"
       },
       "geometry": {
         "type": "Point",
@@ -500,7 +507,7 @@
         "marker-color": "#7e7e7e",
         "marker-size": "medium",
         "marker-symbol": "",
-        "entry": "True"
+        "type": "ENTRY"
       },
       "geometry": {
         "type": "Point",
@@ -516,7 +523,7 @@
         "marker-color": "#7e7e7e",
         "marker-size": "medium",
         "marker-symbol": "",
-        "entry": "Ture"
+        "type": "ENTRY"
       },
       "geometry": {
         "type": "Point",
@@ -532,7 +539,7 @@
         "marker-color": "#7e7e7e",
         "marker-size": "medium",
         "marker-symbol": "",
-        "entry": "True"
+        "type": "ENTRY"
       },
       "geometry": {
         "type": "Point",
@@ -548,7 +555,7 @@
         "marker-color": "#7e7e7e",
         "marker-size": "medium",
         "marker-symbol": "",
-        "entry": "True"
+        "type": "ENTRY"
       },
       "geometry": {
         "type": "Point",
@@ -564,7 +571,7 @@
         "marker-color": "#7e7e7e",
         "marker-size": "medium",
         "marker-symbol": "",
-        "entry": "True"
+        "type": "ENTRY"
       },
       "geometry": {
         "type": "Point",
@@ -580,7 +587,7 @@
         "marker-color": "#7e7e7e",
         "marker-size": "medium",
         "marker-symbol": "",
-        "entry": "True"
+        "type": "ENTRY"
       },
       "geometry": {
         "type": "Point",
@@ -596,7 +603,7 @@
         "marker-color": "#7e7e7e",
         "marker-size": "medium",
         "marker-symbol": "",
-        "entry": "True"
+        "type": "ENTRY"
       },
       "geometry": {
         "type": "Point",
@@ -612,7 +619,7 @@
         "marker-color": "#7e7e7e",
         "marker-size": "medium",
         "marker-symbol": "",
-        "entry": "True"
+        "type": "ENTRY"
       },
       "geometry": {
         "type": "Point",
@@ -628,7 +635,7 @@
         "marker-color": "#7e7e7e",
         "marker-size": "medium",
         "marker-symbol": "",
-        "entry": "True"
+        "type": "ENTRY"
       },
       "geometry": {
         "type": "Point",
@@ -644,7 +651,7 @@
         "marker-color": "#7e7e7e",
         "marker-size": "medium",
         "marker-symbol": "",
-        "entry": "True"
+        "type": "ENTRY"
       },
       "geometry": {
         "type": "Point",
@@ -660,7 +667,7 @@
         "marker-color": "#7e7e7e",
         "marker-size": "medium",
         "marker-symbol": "",
-        "entry": "True"
+        "type": "ENTRY"
       },
       "geometry": {
         "type": "Point",

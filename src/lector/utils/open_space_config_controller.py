@@ -8,6 +8,11 @@ from lector.utils.open_space_models import EntryPoint, OpenSpace
 
 logger = logging.getLogger(__name__)
 
+RESTRICTED_TYPE = "RESTRICTED"
+WALKABLE_TYPE = "WALKABLE"
+BLOCKED_TYPE = "BLOCKED"
+ENTRY_TYPE = "ENTRY"
+
 
 class OpenSpaceConfigController:
     def __init__(self, config_dir='/configs/open_spaces'):
@@ -35,14 +40,17 @@ class OpenSpaceConfigController:
         entry_points = []
         for feature in data['geojson']['features']:
             polygon = feature['geometry']['coordinates'][0]
-            if "walkable" in feature['properties'] and feature['properties']['walkable'] == 'True':
-                walkables.append(polygon)
-            if "restricted" in feature['properties'] and feature['properties']['restricted'] == 'True':
-                restricted.append(polygon)
-            if "blocked" in feature['properties'] and feature['properties']['blocked'] == 'True':
-                blocked.append(polygon)
-            if "entry" in feature['properties'] and feature['properties']['entry'] == "True":
-                entry_points.append(EntryPoint(feature['geometry']['coordinates']))
+            if "type" in feature['properties']:
+                type = feature['properties']['type'].lower()
+                print(type)
+                if type == WALKABLE_TYPE.lower():
+                    walkables.append(polygon)
+                if type == RESTRICTED_TYPE.lower():
+                    restricted.append(polygon)
+                if type == BLOCKED_TYPE.lower():
+                    blocked.append(polygon)
+                if type == ENTRY_TYPE.lower():
+                    entry_points.append(EntryPoint(feature['geometry']['coordinates']))
         if len(walkables) > 1:
             logger.warn(f'Multiple walkable areas detected. Only one walkable area for each config file is allowed!')
         if len(walkables) == 0:
