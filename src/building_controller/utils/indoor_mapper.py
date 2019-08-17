@@ -3,17 +3,13 @@ from typing import List
 
 from building_controller.utils.building_models import GraphStairCase, GraphBuilding, StairCase, Building
 from building_controller.utils.config_controller import IndoorMapperConfigController
-from building_controller.utils.univis_room_controller import UnivISRoomController
-
-# from lector.utils.osmm import OSMManipulator as OSMUtils
-from lector.utils.open_space_models import OpenSpace, GraphBuildingEntryPoint
+from lector.utils.open_space_models import GraphBuildingEntryPoint
 
 logger = logging.getLogger(__name__)
 
 
 class IndoorMapController:
     def __init__(self, osmm):
-        self.univis_c = UnivISRoomController()
         self.indoor_cc = IndoorMapperConfigController()
         self.graph_buildings = None
         self.osmm = osmm

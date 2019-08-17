@@ -2,7 +2,7 @@ import logging
 
 from django.core.management.base import BaseCommand
 
-from lecture_room_service.utils.univis_lecture_room_controller import UnivISLectureController
+from lecture_room_service.utils.univis_lecture_controller import UnivISLectureController
 
 
 class Command(BaseCommand):

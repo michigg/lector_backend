@@ -11,7 +11,7 @@ from building_controller.utils.indoor_mapper import RoomStaircaseController
 from building_controller.utils.univis_models import MinimalRoom
 from lecture_room_service.serializer import LectureSerializer, LonLatSerializer, RoomSerializer, \
     SplittedLectureSerializer
-from lecture_room_service.utils.univis_lecture_room_controller import UnivISLectureController
+from lecture_room_service.utils.univis_lecture_controller import UnivISLectureController
 
 import logging
 
