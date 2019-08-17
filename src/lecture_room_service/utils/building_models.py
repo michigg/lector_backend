@@ -1,6 +1,6 @@
 from typing import List
 
-from indoor_mapper.utils.univis_models import Room
+from building_controller.utils.univis_models import Room
 from lector.utils.open_space_models import EntryPoint
 
 

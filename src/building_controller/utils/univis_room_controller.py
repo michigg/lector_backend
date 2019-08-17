@@ -3,7 +3,7 @@ from typing import List
 import requests
 import xmltodict
 
-from indoor_mapper.utils.univis_models import Room
+from building_controller.utils.univis_models import Room
 
 
 class UnivISRoomController:

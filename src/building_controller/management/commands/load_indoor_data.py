@@ -1,7 +1,7 @@
 import logging
 
 from django.core.management.base import BaseCommand
-from indoor_mapper.utils.indoor_mapper import IndoorMapController
+from building_controller.utils.indoor_mapper import IndoorMapController
 
 
 class Command(BaseCommand):

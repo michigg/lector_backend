@@ -3,7 +3,7 @@ from typing import List
 
 import osmnx as ox
 
-from indoor_mapper.utils.indoor_mapper import IndoorMapController
+from building_controller.utils.indoor_mapper import IndoorMapController
 from lector.utils.graph_open_space_models import GraphOpenSpace
 from lector.utils.open_space_config_controller import OpenSpaceConfigController
 from lector.utils.open_space_models import BBox

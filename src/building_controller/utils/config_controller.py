@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 from typing import List
 
-from indoor_mapper.utils.building_models import Building, Floor, StairCase
+from building_controller.utils.building_models import Building, Floor, StairCase
 from lector.utils.open_space_models import BuildingEntryPoint
 
 logger = logging.getLogger(__name__)

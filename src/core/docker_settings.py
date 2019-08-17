@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'indoor_mapper',
+    'building_controller',
     'lecture_room_service',
     'lector',
     'vgn'

@@ -1,9 +1,9 @@
 import logging
 from typing import List
 
-from indoor_mapper.utils.building_models import GraphStairCase, GraphBuilding, StairCase, Building
-from indoor_mapper.utils.config_controller import IndoorMapperConfigController
-from indoor_mapper.utils.univis_room_controller import UnivISRoomController
+from building_controller.utils.building_models import GraphStairCase, GraphBuilding, StairCase, Building
+from building_controller.utils.config_controller import IndoorMapperConfigController
+from building_controller.utils.univis_room_controller import UnivISRoomController
 
 # from lector.utils.osmm import OSMManipulator as OSMUtils
 from lector.utils.open_space_models import OpenSpace, GraphBuildingEntryPoint

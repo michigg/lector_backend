@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List
 
-from indoor_mapper.utils.univis_models import Room
+from building_controller.utils.univis_models import Room
 from lector.utils.open_space_models import EntryPoint, BuildingEntryPoint, GraphBuildingEntryPoint
 
 
@@ -29,7 +29,6 @@ class StairCase:
         self.neighbours = neighbours
 
     def add_room(self, room: Room):
-        # TODO: better insert sort
         self.rooms.append(room)
         self.rooms.sort(key=lambda x: x.number)
 
