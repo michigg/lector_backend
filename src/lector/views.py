@@ -55,7 +55,7 @@ class ApiOpenSpaceInfos(views.APIView):
                 max_creation_time = timezone.localtime(timezone.now()) - datetime.timedelta(hours=2)
 
                 if creation_time < max_creation_time:
-                    osmm.create_open_space_plot(open_space)
+                    osmm.create_open_space_plot(open_space, settings.MEDIA_ROOT)
             except FileNotFoundError as err:
                 self.create_plot(open_space, osmm)
 

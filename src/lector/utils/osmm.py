@@ -46,11 +46,11 @@ class OSMManipulator:
             self._insert_open_space(buildings, open_space)
         self.plot_graph()
 
-    def create_open_space_plot(self, open_space):
+    def create_open_space_plot(self, open_space, output_dir="/osm_data"):
         buildings = self.indoor_map_c.indoor_cc.get_buildings()
         self.graph = self.download_map(open_space.get_boundaries(boundary_degree_extension=0.001))
         graph_open_space = self._insert_open_space(buildings, open_space)
-        self.plot_graph(output_dir="/osm_data", file_name=graph_open_space.file_name, minimized=False)
+        self.plot_graph(output_dir=output_dir, file_name=graph_open_space.file_name, minimized=False)
 
     def download_map(self, bbox: BBox = BAMBERG_BBOX):
         return ox.graph_from_bbox(*bbox.get_bbox(), simplify=False)
