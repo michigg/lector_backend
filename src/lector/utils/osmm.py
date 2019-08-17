@@ -48,7 +48,7 @@ class OSMManipulator:
 
     def create_open_space_plot(self, open_space, output_dir="/osm_data"):
         buildings = self.indoor_map_c.indoor_cc.get_buildings()
-        self.graph = self.download_map(open_space.get_boundaries(boundary_degree_extension=0.001))
+        self.graph = self.download_map(open_space.get_boundaries(boundary_degree_extension=0.0005))
         graph_open_space = self._insert_open_space(buildings, open_space)
         self.plot_graph(output_dir=output_dir, file_name=graph_open_space.file_name, minimized=False)
 
