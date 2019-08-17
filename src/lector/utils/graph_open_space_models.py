@@ -187,7 +187,7 @@ class GraphOpenSpace(OpenSpace):
         return nodes
 
     def remove_open_space_nodes(self):
-        bbox = self.get_boundaries()
+        bbox = self.get_boundaries(boundary_degree_extension=-0.0005)
         nodes = [node for node, data in self.osmm.graph.nodes(data=True) if
                  bbox.min_lon < data['x'] < bbox.max_lon and bbox.min_lat < data['y'] < bbox.max_lat]
         for node in nodes:
