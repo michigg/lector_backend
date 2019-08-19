@@ -38,6 +38,8 @@ class ApiListOpenSpaces(views.APIView):
             return Response(geojson, status=status.HTTP_200_OK, headers={'access-control-allow-origin': '*'})
         else:
             files = [{"file_name": f} for f in open_space_c.get_open_spaces_files()]
+            logger.warn(files)
+            files.sort(key=lambda x: x['file_name'])
             results = FileNameSerializer(files, many=True).data
             return Response(results, status=status.HTTP_200_OK, headers={'access-control-allow-origin': '*'})
 
@@ -52,7 +54,8 @@ class ApiOpenSpaceInfos(views.APIView):
             try:
                 timestamp = os.path.getctime(f'{settings.MEDIA_ROOT}/{open_space.file_name}.svg')
                 creation_time = datetime.datetime.fromtimestamp(timestamp, tz=timezone.get_current_timezone())
-                max_creation_time = timezone.localtime(timezone.now()) - datetime.timedelta(hours=2)
+                max_creation_time = timezone.localtime(timezone.now()) - datetime.timedelta(
+                    hours=settings.OPEN_SPACE_MAX_CACHING_TIME)
 
                 if creation_time < max_creation_time:
                     osmm.create_open_space_plot(open_space, settings.MEDIA_ROOT)

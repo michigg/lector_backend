@@ -121,6 +121,9 @@ STATICFILES_DIRS = (
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+
+OPEN_SPACE_MAX_CACHING_TIME=int(os.environ.get('OPEN_SPACE_MAX_CACHING_TIME', '0'))
+
 ########################################################################################################################
 #                                         Logging Config                                                               #
 ########################################################################################################################
@@ -142,7 +145,7 @@ LOGGING = {
     'loggers': {
         '': {
             'handlers': ['console'],
-            'level': 'DEBUG',
+            'level': 'WARNING',
         }
     },
 }
