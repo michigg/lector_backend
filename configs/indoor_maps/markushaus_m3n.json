@@ -79,6 +79,9 @@
     },
     {
       "name": "Haupttreppe",
+      "neighbours": [
+        "Turm"
+      ],
       "coord": [
         10.883814096450806,
         49.89561235816914
@@ -102,7 +105,7 @@
       ],
       "floors": [
         {
-          "level": "K",
+          "level": -1,
           "ranges": [
             [
               0,
@@ -157,6 +160,9 @@
     },
     {
       "name": "Nebeneingang",
+      "neighbours": [
+        "Turm"
+      ],
       "coord": [
         10.883148908615112,
         49.895678015714495
@@ -179,7 +185,7 @@
       ],
       "floors": [
         {
-          "level": "K",
+          "level": -1,
           "ranges": [
             [
               21,

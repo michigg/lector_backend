@@ -1,0 +1,197 @@
+{
+  "building_id": "F21",
+  "staircases": [
+    {
+      "name": "Vorne Rechts",
+      "neighbours": [
+        "Vorne Links",
+        "Hinten Rechts"
+      ],
+      "coord": [
+        10.904827862977982,
+        49.9074059571466
+      ],
+      "entries": [
+        {
+          "wheelchair": false,
+          "coord": [
+            10.904790312051773,
+            49.90750873787232
+          ]
+        }
+      ],
+      "floors": [
+        {
+          "level": 0,
+          "ranges": [[0, 9], [17, 19]]
+        },
+        {
+          "level": 1,
+          "ranges": [[0, 4], [14, 15]]
+        },
+        {
+          "level": 2,
+          "ranges": [[0, 4], [6, 8], [16, 18]]
+        },
+        {
+          "level": 3,
+          "ranges": [[0, 3], [11, 14], [20, 22], [84, 84], [86, 86]]
+        }
+      ]
+    },
+    {
+      "name": "Mitte Rechts",
+      "neighbours": [
+        "Vorne Rechts",
+        "Hinten Rechts"
+      ],
+      "coord": [
+        10.904488563537598,
+        49.90740336603305
+      ],
+      "entries": [
+        {
+          "wheelchair": true,
+          "coord": [
+            10.904790312051773,
+            49.90750873787232
+          ]
+        },
+        {
+          "wheelchair": true,
+          "coord": [
+            10.904059410095215,
+            49.907218532906484
+          ]
+        }
+      ],
+      "floors": [
+        {
+          "level": 0,
+          "ranges": [[99, 114]]
+        },
+        {
+          "level": 1,
+          "ranges": [[7, 7], [57, 57]]
+        }
+      ]
+    },
+    {
+      "name": "Hinten Rechts",
+      "neighbours": [
+        "Vorne Rechts",
+        "Mitte Rechts",
+        "Hinten Links"
+      ],
+      "coord": [
+        10.904488563537598,
+        49.90740336603305
+      ],
+      "entries": [
+        {
+          "wheelchair": true,
+          "coord": [
+            10.904059410095215,
+            49.907218532906484
+          ]
+        }
+      ],
+      "floors": [
+        {
+          "level": 0,
+          "ranges": [[77, 89], [94, 97], [117, 117]]
+        },
+        {
+          "level": 1,
+          "ranges": [[43, 45], [52, 55]]
+        },
+        {
+          "level": 2,
+          "ranges": [[39, 41], [49, 53], [55, 55], [57, 57]]
+        },
+        {
+          "level": 3,
+          "ranges": [[59, 61], [67, 71], [79, 81], [83, 83], [85, 85]]
+        }
+      ]
+    },
+    {
+      "name": "Hinten Links",
+      "wheelchair": true,
+      "neighbours": [
+        "Vorne Links",
+        "Hinten Rechts"
+      ],
+      "coord": [
+        10.90461865067482,
+        49.906841091097654
+      ],
+      "entries": [
+        {
+          "wheelchair": true,
+          "coord": [
+            10.904573053121567,
+            49.90678322218391
+          ]
+        }
+      ],
+      "floors": [
+        {
+          "level": 0,
+          "ranges": [[41, 41], [49, 62], [65, 67], [71, 75]]
+        },
+        {
+          "level": 1,
+          "ranges": [[29, 32], [38, 37], [40, 45]]
+        },
+        {
+          "level": 2,
+          "ranges": [[29, 31], [35, 38]]
+        },
+        {
+          "level": 3,
+          "ranges": [[37, 45], [49, 52], [55, 59], [62, 67], [57, 57]]
+        }
+      ]
+    },
+    {
+      "name": "Vorne Links",
+      "wheelchair": true,
+      "neighbours": [
+        "Hinten Links",
+        "Vorne Rechts"
+      ],
+      "coord": [
+        10.905089378356934,
+        49.90699828690093
+      ],
+      "entries": [
+        {
+          "wheelchair": true,
+          "coord": [
+            10.905203372240067,
+            49.907019015979635
+          ]
+        }
+      ],
+      "floors": [
+        {
+          "level": 0,
+          "ranges": [[20, 21], [27, 33], [35, 40], [44, 48]]
+        },
+        {
+          "level": 1,
+          "ranges": [[17, 18], [23, 27], [34, 36]]
+        },
+        {
+          "level": 2,
+          "ranges": [[18, 21], [23, 28]]
+        },
+        {
+          "level": 3,
+          "ranges": [[14, 19], [23, 25], [28, 36], [46, 48]]
+        }
+      ]
+    }
+  ]
+}

@@ -38,7 +38,6 @@ class ApiListOpenSpaces(views.APIView):
             return Response(geojson, status=status.HTTP_200_OK, headers={'access-control-allow-origin': '*'})
         else:
             files = [{"file_name": f} for f in open_space_c.get_open_spaces_files()]
-            logger.warn(files)
             files.sort(key=lambda x: x['file_name'])
             results = FileNameSerializer(files, many=True).data
             return Response(results, status=status.HTTP_200_OK, headers={'access-control-allow-origin': '*'})

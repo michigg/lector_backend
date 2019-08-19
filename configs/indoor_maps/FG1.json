@@ -1,0 +1,65 @@
+{
+  "building_id": "FG1",
+  "staircases": [
+    {
+      "name": "Haupteingang",
+      "neighbours": [
+        "Hintertreppe"
+      ],
+      "wheelchair": false,
+      "coord": [
+        10.90336874127388,
+        49.90738781934875
+      ],
+      "entries": [
+        {
+          "wheelchair": true,
+          "coord": [
+            10.903408974409103,
+            49.90731958661951
+          ]
+        }
+      ],
+      "floors": [
+        {
+          "level": 0,
+          "ranges": [[8, 9]]
+        },
+        {
+          "level": 1,
+          "ranges": [[5, 11]]
+        }
+      ]
+    },
+    {
+      "name": "Hintertreppe",
+      "neighbours": [
+        "Haupteingang"
+      ],
+      "wheelchair": false,
+      "coord": [
+        10.903767049312592,
+        49.907458643092205
+      ],
+      "entries": [
+        {
+          "wheelchair": true,
+          "coord": [
+            10.903879702091215,
+            49.907526011922386
+          ]
+        }
+      ],
+      "floors": [
+        {
+          "level": 0,
+          "ranges": [[1, 6], [10, 20]]
+        },
+        {
+          "level": 1,
+          "ranges": [[1, 4], [12, 18]]
+        }
+      ]
+    }
+  ]
+}
