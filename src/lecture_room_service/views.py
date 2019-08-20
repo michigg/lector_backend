@@ -57,18 +57,3 @@ class ApiRooms(views.APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST, headers={'access-control-allow-origin': '*'})
 
 
-@permission_classes((AllowAny,))
-class ApiRoomCoord(views.APIView):
-    def get(self, request):
-        building = request.GET.get('building', None)
-        level = request.GET.get('level', None)
-        number = request.GET.get('number', None)
-        if building and level and number:
-            room_staircase_c = RoomStaircaseController()
-            staircase = room_staircase_c.get_rooms_staircase(Room(building, level, number))
-            if staircase:
-                result = LonLatSerializer({'longitude': staircase.coord[0], 'latitude': staircase.coord[1]},
-                                          many=False).data
-                return Response(result,
-                                status=status.HTTP_200_OK, headers={'access-control-allow-origin': '*'})
-        return Response(status=status.HTTP_400_BAD_REQUEST, headers={'access-control-allow-origin': '*'})
