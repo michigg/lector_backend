@@ -6,7 +6,7 @@
       "name": "Turm",
       "neighbours": [
         "Haupttreppe",
-        "Nebeneingang"
+        "Seitliches Treppenhaus"
       ],
       "blocked": "2019-01-01",
       "coord": [
@@ -79,6 +79,7 @@
     },
     {
       "name": "Haupttreppe",
+      "wheelchair": true,
       "neighbours": [
         "Turm"
       ],
@@ -96,7 +97,7 @@
         },
         {
           "wheelchair": false,
-          "blocked": "2019-01-01",
+          "blocked": "2019-12-12",
           "coord": [
             10.883757770061493,
             49.895605446843355
@@ -159,7 +160,8 @@
       ]
     },
     {
-      "name": "Nebeneingang",
+      "name": "Seitliches Treppenhaus",
+      "wheelchair": true,
       "neighbours": [
         "Turm"
       ],
