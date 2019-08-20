@@ -103,6 +103,18 @@ class OpenSpace:
         max_lon = max(longitudes) + boundary_degree_extension
         return BBox(max_lat, min_lat, max_lon, min_lon)
 
+    def get_minimal_dict(self):
+        buildings = []
+        if self.buildings:
+            buildings = self.buildings
+        return {"file_name": self.file_name,
+                "walkable_area_nodes": len(self.walkable_area_coords),
+                "restricted_areas": len(self.restricted_areas_coords),
+                "blocked_areas": len(self.blocked_areas_coords),
+                "entry_points": len(self.entry_points),
+                "buildings": len(buildings)
+                }
+
 
 class GraphBuildingEntryPoint(BuildingEntryPoint, GraphEntryPoint):
     def __init__(self, entry_point: BuildingEntryPoint, osmm):
