@@ -281,7 +281,7 @@
         "stroke-opacity": 1,
         "fill": "#555555",
         "fill-opacity": 0.5,
-        "blocked": "True"
+        "type": "BLOCKED"
       },
       "geometry": {
         "type": "Polygon",
