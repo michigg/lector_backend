@@ -16,16 +16,16 @@ class IndoorMapperConfigController:
         self.buildings = self.get_buildings()
         logger.info(f'LOADED BUILDINGS {len(self.buildings)}')
 
-    def _load_building_config(self, file='erba.json'):
+    def load_building_config(self, file='WE5.json'):
         logger.info(f'LOAD config of file {self.config_dir}/{file}')
         with open(f'{self.config_dir}/{file}') as f:
             return json.load(f)
 
-    def _get_build_config_files(self):
+    def get_building_config_files(self):
         return [f for f in os.listdir(self.config_dir) if f.endswith('.json')]
 
     def get_buildings(self) -> List[Building]:
-        return [self._get_building(self._load_building_config(file)) for file in self._get_build_config_files()]
+        return [self._get_building(self.load_building_config(file)) for file in self.get_building_config_files()]
 
     def _get_building(self, building: dict):
         return Building(building['building_id'], self._get_staircases(building))
