@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from typing import List
 
@@ -7,11 +8,16 @@ from lector.utils.open_space_models import BuildingEntryPoint, GraphBuildingEntr
 class Room:
     def __init__(self, building_key=None, level=None, number=None):
         self.building_key = building_key
-        self.number = int(number)
+        self.number = number
         self.level = int(level)
 
+    def get_number(self):
+        pattern = re.compile('([0-9]*).*')
+        match = pattern.match(self.number)
+        return int(match.group())
+
     def __str__(self):
-        return f'{self.building_key}/{self.level:02d}.{self.number:03d}'
+        return f'{self.building_key}/{self.level:02d}.{self.number}'
 
 
 class Floor:
@@ -21,7 +27,7 @@ class Floor:
 
     def is_floor_room(self, room: Room):
         for range in self.ranges:
-            if range[0] <= room.number <= range[1]:
+            if range[0] <= room.get_number() <= range[1]:
                 return True
         return False
 
