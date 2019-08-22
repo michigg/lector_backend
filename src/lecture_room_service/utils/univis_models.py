@@ -1,9 +1,12 @@
+import logging
 from enum import Enum
 from typing import List
 
 from django.utils import timezone
 
 from building_controller.utils.building_models import Room
+
+logger = logging.getLogger(__name__)
 
 
 class UnivISRoom(Room):
@@ -13,6 +16,7 @@ class UnivISRoom(Room):
         self.univis_key = univis_room['@key']
 
     def _init_room_number(self, univis_room) -> (str, int, int):
+        logging.warn(univis_room['short'])
         splitted_room_id = str(univis_room['short']).split('/')
         splitted_room_number = splitted_room_id[1].split('.')
         building_key = splitted_room_id[0]
@@ -57,7 +61,7 @@ class LectureTerm:
         self.starttime = timezone.datetime.strptime(univis_term.get('starttime'), '%H:%M')
         self.endtime = timezone.datetime.strptime(univis_term.get('endtime'), '%H:%M')
         self.repeat = univis_term.get('repeat')
-        self.room = list(filter(lambda x: x.univis_key == dict(univis_term['room']['UnivISRef']).get('@key'), rooms))[0]
+        self.room = rooms
 
 
 class Lecture:
@@ -77,7 +81,7 @@ class Lecture:
                 dozs = [dict(dozs['UnivISRef'])]
 
         self.univis_key = univis_lecture.get('@key')
-        self.terms = [LectureTerm(term, rooms) for term in terms if 'room' in term]
+        self._init_lecture_terms(rooms, terms)
         self.type = self._get_type(univis_lecture.get('type'))
         self.lecturers = [Person(lecturer) for lecturer in dozs]
         self.name = univis_lecture.get('name')
@@ -85,6 +89,15 @@ class Lecture:
         self.parent_lecture__ref = univis_lecture['parent-lv']['UnivISRef']['@key'] if univis_lecture.get('parent-lv',
                                                                                                           None) else None
         self.parent_lecture = None
+
+    def _init_lecture_terms(self, rooms, terms):
+        lecture_terms = []
+        for term in terms:
+            if 'room' in term:
+                rooms = list(filter(lambda x: x.univis_key == dict(term['room']['UnivISRef']).get('@key'), rooms))
+                if rooms:
+                    lecture_terms.append(LectureTerm(term, rooms[0]))
+        self.terms = lecture_terms
 
     def _get_type(self, univis_type):
         types = {'V': LectureType.LECTURE, 'Ü': LectureType.EXERCISE, 'TU': LectureType.TUTORIUM,

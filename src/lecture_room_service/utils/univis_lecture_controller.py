@@ -1,11 +1,13 @@
 import logging
 from typing import List
+from xml.parsers.expat import ExpatError
 
 import requests
 import xmltodict
 from django.utils import timezone
 
 from lecture_room_service.utils.univis_models import UnivISRoom, Lecture, Person
+from lecture_room_service.utils.univis_room_controller import UnivISRoomController
 
 logger = logging.getLogger(__name__)
 
@@ -14,21 +16,27 @@ class UnivISLectureController:
     def __init__(self):
         self.univis_api_base_url = "http://univis.uni-bamberg.de/prg"
         self.semester = "2019s"
+        self.univis_room_controller = UnivISRoomController()
 
     def _get_univis_api_url(self, lecture_search_token):
         return f'{self.univis_api_base_url}?search=lectures&name={lecture_search_token}&sem={self.semester}&show=xml'
 
     def load_page(self, url: str):
-        return xmltodict.parse(requests.get(url).content)
+        data = requests.get(url).content
+        try:
+            return xmltodict.parse(data)
+        except ExpatError as err:
+            return None
 
     def get_rooms(self, data: dict) -> List[UnivISRoom]:
         rooms = []
         if 'Room' in data['UnivIS']:
             if type(data['UnivIS']['Room']) is list:
-                for room in data['UnivIS']['Room']:
-                    rooms.append(UnivISRoom(room))
+                rooms = self.univis_room_controller.get_rooms_from_data(data['UnivIS']['Room'])
             else:
-                rooms.append(UnivISRoom(data['UnivIS']['Room']))
+                room = UnivISRoom(data['UnivIS']['Room']) if self.univis_room_controller.is_a_room(data['UnivIS']['Room']) else None
+                if room:
+                    rooms.append(room)
         return rooms
 
     def get_persons(self, data: dict) -> List[Person]:
@@ -57,24 +65,26 @@ class UnivISLectureController:
 
     def get_lectures_by_token(self, token: str):
         data = self.load_page(self._get_univis_api_url(token))
-        rooms = self.get_rooms(data)
-        persons = self.get_persons(data)
-        lectures = self.get_lectures(data, rooms)
-        lecture_map = self.get_univis_key_dict(lectures)
-        person_map = self.get_univis_key_dict(persons)
-        clean_lectures = []
-        for lecture in lectures:
-            if len(lecture.terms) > 0:
-                if lecture.parent_lecture__ref:
-                    lecture.parent_lecture = lecture_map[lecture.parent_lecture__ref]
-                new_lecturers = []
-                for lecturer in lecture.lecturers:
-                    new_lecturers.append(person_map[lecturer.univis_key])
-                lecture.lecturers = new_lecturers
-                clean_lectures.append(lecture)
+        if data:
+            rooms = self.get_rooms(data)
+            persons = self.get_persons(data)
+            lectures = self.get_lectures(data, rooms)
+            lecture_map = self.get_univis_key_dict(lectures)
+            person_map = self.get_univis_key_dict(persons)
+            clean_lectures = []
+            for lecture in lectures:
+                if len(lecture.terms) > 0:
+                    if lecture.parent_lecture__ref:
+                        lecture.parent_lecture = lecture_map[lecture.parent_lecture__ref]
+                    new_lecturers = []
+                    for lecturer in lecture.lecturers:
+                        new_lecturers.append(person_map[lecturer.univis_key])
+                    lecture.lecturers = new_lecturers
+                    clean_lectures.append(lecture)
 
-        logger.info(f'FOUND LECTURES {len(clean_lectures)}')
-        return clean_lectures
+            logger.info(f'FOUND LECTURES {len(clean_lectures)}')
+            return clean_lectures
+        return []
 
     def get_lectures_split_by_date(self, lectures):
         current_time = timezone.localtime(timezone.now())

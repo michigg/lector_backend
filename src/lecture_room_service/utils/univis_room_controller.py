@@ -1,9 +1,14 @@
+import logging
+import re
 from typing import List
+from xml.parsers.expat import ExpatError
 
 import requests
 import xmltodict
 
 from lecture_room_service.utils.univis_models import UnivISRoom
+
+logger = logging.getLogger(__name__)
 
 
 class UnivISRoomController:
@@ -15,7 +20,12 @@ class UnivISRoomController:
 
     @staticmethod
     def loadPage(url: str):
-        return xmltodict.parse(requests.get(url).content)
+        logger.info(f'Load {url}')
+        data = requests.get(url).content
+        try:
+            return xmltodict.parse(data)
+        except ExpatError as err:
+            return None
 
     @staticmethod
     def get_rooms_with_same_key(data: dict, key: str) -> List[UnivISRoom]:
@@ -23,17 +33,19 @@ class UnivISRoomController:
             return []
         return [UnivISRoom(room) for room in data['UnivIS']['Room'] if str(f'{key}/').lower() in room['short'].lower()]
 
-    def get_rooms(self, data: dict) -> List[UnivISRoom]:
+    def get_rooms_from_data(self, data: List):
+        return [UnivISRoom(room) for room in data if self.is_a_room(room)]
+
+    def get_rooms_request(self, data: dict) -> List[UnivISRoom]:
         if 'Room' not in data['UnivIS']:
             return []
-        return [UnivISRoom(room) for room in data['UnivIS']['Room'] if not self.is_a_room_group(room)]
+        return self.get_rooms_from_data(data['UnivIS']['Room'])
 
-    def is_a_room_group(self, room: dict):
-        room_group_indicators = ['Raumgruppe', 'PR_']
-        for indicator in room_group_indicators:
-            if indicator.lower() in room['short'].lower():
-                return True
-        return False
+    def is_a_room(self, room: dict):
+        try:
+            return re.match("([a-zA-Z]*[0-9]*)\/([0-9]{2})\.([0-9]{2,3}).*", room['short'])
+        except TypeError:
+            return False
 
     @staticmethod
     def get_persons(data: dict):
@@ -46,4 +58,7 @@ class UnivISRoomController:
 
     def get_rooms_by_token(self, token) -> List[UnivISRoom]:
         data = self.loadPage(self._get_univis_api_url(token))
-        return self.get_rooms(data)
+        logger.warn(data)
+        if data:
+            return self.get_rooms_request(data)
+        return []
