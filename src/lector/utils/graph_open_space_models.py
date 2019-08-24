@@ -1,7 +1,7 @@
 import os
 from typing import List
 
-from shapely.geometry import Polygon, LineString
+from shapely.geometry import Polygon, LineString, Point
 from shapely.prepared import prep
 
 from lector.utils.open_space_models import OpenSpace, GraphOpenSpaceEntryPoint
@@ -188,9 +188,8 @@ class GraphOpenSpace(OpenSpace):
 
     def remove_open_space_nodes(self):
         # TODO better
-        bbox = self.get_boundaries(boundary_degree_extension=-0.00035)
-        nodes = [node for node, data in self.osmm.graph.nodes(data=True) if
-                 bbox.min_lon < data['x'] < bbox.max_lon and bbox.min_lat < data['y'] < bbox.max_lat]
+        # bbox = self.get_boundaries(boundary_degree_extension=-0.00035)
+        nodes = [node for node, data in self.osmm.graph.nodes(data=True) if self.walkable_area_prep_poly.contains(Point(self.osmm.get_coord_from_id(node)))]
         for node in nodes:
             self.osmm.graph.remove_node(node)
 
