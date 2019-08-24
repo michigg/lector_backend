@@ -3,7 +3,7 @@ import math
 from datetime import datetime
 from typing import List
 
-from shapely.geometry import Point
+from shapely.geometry import Point, LineString
 from shapely.ops import nearest_points
 
 logger = logging.getLogger(__name__)
@@ -33,6 +33,9 @@ class GraphEntryPoint(EntryPoint):
         nearest_point = nearest_points(self.open_space_point, nearest_edge[0])[1]
         self.graph_entry_node_coord = [nearest_point.x, nearest_point.y]
         self.graph_entry_edge = [nearest_edge[1], nearest_edge[2]]
+
+    def get_edge(self) -> LineString:
+        return LineString([self.open_space_point, Point(*self.graph_entry_node_coord)])
 
     def add_edges(self):
         self.osmm.add_osm_edge(self.graph_entry_edge[0], self.nearest_graph_node_id, "Eingang")

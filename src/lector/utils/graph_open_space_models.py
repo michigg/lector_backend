@@ -4,7 +4,7 @@ from typing import List
 from shapely.geometry import Polygon, LineString, Point
 from shapely.prepared import prep
 
-from lector.utils.open_space_models import OpenSpace, GraphOpenSpaceEntryPoint
+from lector.utils.open_space_models import OpenSpace, GraphOpenSpaceEntryPoint, OpenSpaceEntryPoint
 
 
 class GraphOpenSpace(OpenSpace):
@@ -150,6 +150,7 @@ class GraphOpenSpace(OpenSpace):
 
         self.graph_entry_points = [GraphOpenSpaceEntryPoint(entry_point, self.osmm, self) for entry_point in
                                    self.entry_points]
+        # self.get_entry_points()
 
         # Set Restricted Area Nodes
         for restricted_area_coords in self.restricted_areas_coords:
@@ -189,7 +190,8 @@ class GraphOpenSpace(OpenSpace):
     def remove_open_space_nodes(self):
         # TODO better
         # bbox = self.get_boundaries(boundary_degree_extension=-0.00035)
-        nodes = [node for node, data in self.osmm.graph.nodes(data=True) if self.walkable_area_prep_poly.contains(Point(self.osmm.get_coord_from_id(node)))]
+        nodes = [node for node, data in self.osmm.graph.nodes(data=True) if
+                 self.walkable_area_prep_poly.contains(Point(self.osmm.get_coord_from_id(node)))]
         for node in nodes:
             self.osmm.graph.remove_node(node)
 
@@ -212,3 +214,5 @@ class GraphOpenSpace(OpenSpace):
         text = ax.text(-0.2, 1.05, "Aribitrary text", transform=ax.transAxes)
         ax.grid('on')
         fig.savefig(f'/osm_data/{self.file_name}_polys.svg', bbox_extra_artists=(lgd, text), bbox_inches='tight')
+
+
