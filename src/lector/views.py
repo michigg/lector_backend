@@ -2,14 +2,13 @@ from __future__ import unicode_literals
 
 import datetime
 import os
-import stat
 from django.utils import timezone
 from rest_framework import views, status
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from building_controller.utils.config_controller import IndoorMapperConfigController
+from building_controller.config_controller import BuildingConfigController
 from lector.serializer import MovementTypeSerializer, FileNameSerializer
 from lector.utils.open_space_config_controller import OpenSpaceConfigController
 from lector.utils.osmm import OSMManipulator
@@ -70,7 +69,7 @@ class ApiListOpenSpaceConfig(views.APIView):
     def get(self, request, file_name):
         open_space_c = OpenSpaceConfigController()
         open_space_c = open_space_c.get_open_space(file_name)
-        building_c = IndoorMapperConfigController()
+        building_c = BuildingConfigController()
         open_space_c.set_buildings(building_c.buildings)
         if open_space_c:
             logger.warn(open_space_c.__dict__)

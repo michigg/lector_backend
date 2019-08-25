@@ -3,7 +3,7 @@ from typing import List
 
 import osmnx as ox
 
-from building_controller.utils.indoor_mapper import IndoorMapController
+from building_controller.controller import GraphBuildingController
 from lector.utils.graph_open_space_models import GraphOpenSpace
 from lector.utils.open_space_config_controller import OpenSpaceConfigController
 from lector.utils.open_space_models import BBox
@@ -26,7 +26,7 @@ class OSMManipulator:
         self.graph = None
         self.current_osm_id = 0
         self.osp_config_c = OpenSpaceConfigController(OPEN_SPACE_CONFIG_DIR)
-        self.indoor_map_c = IndoorMapController(self)
+        self.indoor_map_c = GraphBuildingController(self)
 
     def create_seperate_open_spaces_plots(self):
         open_spaces = self.osp_config_c.get_open_spaces()

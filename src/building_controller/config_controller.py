@@ -4,20 +4,19 @@ import os
 from datetime import datetime
 from typing import List
 
-from building_controller.utils.building_models import Building, Floor, StairCase
+from building_controller.models import Building, Floor, StairCase
 from lector.utils.open_space_models import BuildingEntryPoint
 
 logger = logging.getLogger(__name__)
 
 
-class IndoorMapperConfigController:
+class BuildingConfigController:
     def __init__(self, config_dir='/configs/indoor_maps'):
         self.config_dir = config_dir
         self.buildings = self.get_buildings()
         logger.info(f'LOADED BUILDINGS {len(self.buildings)}')
 
-    def load_building_config(self, file='WE5.json'):
-        logger.info(f'LOAD config of file {self.config_dir}/{file}')
+    def get_building_config(self, file='WE5.json'):
         with open(f'{self.config_dir}/{file}') as f:
             return json.load(f)
 
@@ -25,7 +24,7 @@ class IndoorMapperConfigController:
         return [f for f in os.listdir(self.config_dir) if f.endswith('.json')]
 
     def get_buildings(self) -> List[Building]:
-        return [self._get_building(self.load_building_config(file)) for file in self.get_building_config_files()]
+        return [self._get_building(self.get_building_config(file)) for file in self.get_building_config_files()]
 
     def _get_building(self, building: dict):
         return Building(building['building_id'], self._get_staircases(building))

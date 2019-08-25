@@ -4,7 +4,7 @@ from typing import List
 
 from django.utils import timezone
 
-from building_controller.utils.building_models import Room
+from building_controller.models import Room
 
 logger = logging.getLogger(__name__)
 

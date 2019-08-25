@@ -1,21 +1,23 @@
 import logging
 from typing import List
 
-from building_controller.utils.building_models import GraphStairCase, GraphBuilding, StairCase, Building, Room
-from building_controller.utils.config_controller import IndoorMapperConfigController
+from building_controller.models import StairCase, Building, Room
+from building_controller.graph_models import GraphStairCase, GraphBuilding
+from building_controller.config_controller import BuildingConfigController
 from lector.utils.open_space_models import GraphBuildingEntryPoint
 
 logger = logging.getLogger(__name__)
 
 
-class IndoorMapController:
+class GraphBuildingController:
     def __init__(self, osmm):
-        self.indoor_cc = IndoorMapperConfigController()
+        self.indoor_cc = BuildingConfigController()
         self.graph_buildings = None
         self.osmm = osmm
 
     def add_buildings_to_graph(self, buildings: List[GraphBuilding]):
         for building in buildings:
+            logger.info(f'ADD Building {building.key} to graph')
             building.add_staircase_edges()
 
     def get_graph_buildings(self, buildings: List[Building]) -> List[GraphBuilding]:
@@ -29,9 +31,9 @@ class IndoorMapController:
         return [GraphBuildingEntryPoint(entry, self.osmm) for entry in staircase.entries]
 
 
-class RoomStaircaseController:
+class BuildingController:
     def __init__(self):
-        self.indoor_cc = IndoorMapperConfigController()
+        self.indoor_cc = BuildingConfigController()
 
     def get_rooms_staircase(self, room: Room, wheelchair=False) -> StairCase or None:
         for building in self.indoor_cc.buildings:

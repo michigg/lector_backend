@@ -7,9 +7,7 @@ from rest_framework.decorators import permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from building_controller.utils.building_models import Room
-from building_controller.utils.indoor_mapper import RoomStaircaseController
-from lecture_room_service.serializer import LonLatSerializer, RoomSerializer, \
+from lecture_room_service.serializer import RoomSerializer, \
     SplittedLectureSerializer
 from lecture_room_service.utils.univis_lecture_controller import UnivISLectureController
 from lecture_room_service.utils.univis_room_controller import UnivISRoomController
