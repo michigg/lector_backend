@@ -24,5 +24,6 @@ urlpatterns = [
                   path('api/v1/', include('apps.univis_controller.urls')),
                   path('api/v1/', include('apps.vgn_controller.urls')),
                   path('api/v1/', include('apps.building_controller.urls')),
+                  path('api/v1/', include('apps.open_space_controller.urls')),
                   path('api-auth/', include('rest_framework.urls')),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
