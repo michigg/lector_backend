@@ -28,10 +28,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'building_controller',
-    'lecture_room_service',
-    'lector',
-    'vgn'
+    'apps.building_controller',
+    'apps.univis_controller',
+    'apps.lector',
+    'apps.vgn_controller'
 ]
 
 MIDDLEWARE = [
@@ -122,7 +122,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
-OPEN_SPACE_MAX_CACHING_TIME=int(os.environ.get('OPEN_SPACE_MAX_CACHING_TIME', '0'))
+
 
 ########################################################################################################################
 #                                         Logging Config                                                               #
@@ -149,3 +149,9 @@ LOGGING = {
         }
     },
 }
+
+########################################################################################################################
+#                                          Custom Config                                                               #
+########################################################################################################################
+OPEN_SPACE_MAX_CACHING_TIME=int(os.environ.get('OPEN_SPACE_MAX_CACHING_TIME', '0'))
+UNIVIS_SEMESTER = os.environ.get('UNIVIS_SEMESTER', "2019s")

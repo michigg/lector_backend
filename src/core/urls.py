@@ -20,9 +20,9 @@ from django.urls import path, include
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
-                  path('api/v1/', include('lector.urls')),
-                  path('api/v1/', include('lecture_room_service.urls')),
-                  path('api/v1/', include('vgn.urls')),
-                  path('api/v1/', include('building_controller.urls')),
+                  path('api/v1/', include('apps.lector.urls')),
+                  path('api/v1/', include('apps.univis_controller.urls')),
+                  path('api/v1/', include('apps.vgn_controller.urls')),
+                  path('api/v1/', include('apps.building_controller.urls')),
                   path('api-auth/', include('rest_framework.urls')),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
