@@ -3,6 +3,8 @@ logs/
 graphs/
 osm_data/
 cache/
+.svg
+media/
 # ---> Python
 # Byte-compiled / optimized / DLL files
 __pycache__/
