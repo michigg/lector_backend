@@ -1,5 +1,6 @@
 import json
 import logging
+from typing import List
 
 import requests
 # Create your views here.
@@ -11,7 +12,6 @@ from rest_framework.response import Response
 from .controller import VGNCoordController
 
 logger = logging.getLogger(__name__)
-VGN_CONNECTIONS_URL = "https://www.vgn.de/verbindungen/"
 
 
 @permission_classes((AllowAny,))
@@ -20,14 +20,19 @@ class ApiVGNConnection(views.APIView):
         from_lat = request.GET.get('from_lat', None)
         from_lon = request.GET.get('from_lon', None)
         building_key = request.GET.get('building_key', None)
-        if from_lat and from_lon and building_key:
+        level = request.GET.get('level', None)
+        number = request.GET.get('number', None)
+
+        if from_lat and from_lon and building_key and level and number:
             vgn_c = VGNCoordController()
-            vgn_coord = vgn_c.get_vgn_coord(building_key)
-            response = requests.get(
-                f"https://www.vgn.de/ib/site/tools/VN_PointLookup.php?class=coord&lon={from_lon}&lat={from_lat}")
-            if vgn_coord and response.status_code == 200:
-                to_coord = json.loads(response.text)['ident']['name']
+            staircase_coord = vgn_c.get_rooms_staircase_coord(building_key, level, number)
+
+            from_coord = vgn_c.get_vgn_coord(from_lon, from_lat)
+            to_coord = vgn_c.get_vgn_coord(staircase_coord[0], staircase_coord[1])
+
+            if from_coord and to_coord:
                 return Response(
-                    {"url": f'{VGN_CONNECTIONS_URL}?to=coord:{to_coord}&td={vgn_coord.vgn_url_segment}'},
-                    status=status.HTTP_200_OK, headers={'access-control-allow-origin': '*'})
+                    {"url": vgn_c.get_vgn_connections_link(from_coord, to_coord)},
+                    status=status.HTTP_200_OK,
+                    headers={'access-control-allow-origin': '*'})
         return Response(status=status.HTTP_400_BAD_REQUEST, headers={'access-control-allow-origin': '*'})
