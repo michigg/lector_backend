@@ -17,7 +17,6 @@ class UnivISRoom(Room):
         self.univis_key = univis_room['@key']
 
     def _init_room_number(self, univis_room) -> (str, int, int):
-        logging.warn(univis_room['short'])
         splitted_room_id = str(univis_room['short']).split('/')
         splitted_room_number = splitted_room_id[1].split('.')
         building_key = splitted_room_id[0]
