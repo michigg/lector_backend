@@ -190,7 +190,7 @@ class GraphOpenSpace(OpenSpace):
             self.blocked_areas_nodes.append([self.osmm.add_osm_node(coord) for coord in blocked_area_coords])
 
     def get_name(self):
-        os.path.basename(self.file_name)
+        return f'Freifläche {os.path.splitext(self.file_name)[0].upper()}'
 
     def _set_polygon_edges(self, nodes):
         last_node = None

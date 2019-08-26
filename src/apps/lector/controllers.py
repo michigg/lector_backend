@@ -95,7 +95,7 @@ class OSMController:
             self.graph.add_edge(from_id, to_id,
                                 highway='pedestrian',
                                 lanes='1',
-                                name='Open Space',
+                                name=name,
                                 oneway=True, )
 
     def add_osm_node(self, coords: List[List[float]]):
