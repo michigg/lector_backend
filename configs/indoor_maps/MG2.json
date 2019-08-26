@@ -4,6 +4,7 @@
   "staircases": [
     {
       "name": "Haupttreppe",
+      "wheelchair": true,
       "coord": [
         10.882569551467896,
         49.89543611905302

@@ -4,6 +4,7 @@
   "staircases": [
     {
       "name": "Haupteingang",
+      "wheelchair": true,
       "coord": [
         10.883540511131287,
         49.895418840673656
@@ -20,7 +21,12 @@
       "floors": [
         {
           "level": 0,
-          "ranges": [[0, 999]]
+          "ranges": [
+            [
+              0,
+              999
+            ]
+          ]
         }
       ]
     }

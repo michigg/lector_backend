@@ -1,5 +1,6 @@
 {
   "building_id": "FMA",
+   "wheelchair": true,
   "staircases": [
     {
       "name": "Haupteingang",

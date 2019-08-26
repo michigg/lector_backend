@@ -4,6 +4,7 @@
   "staircases": [
     {
       "name": "Treppenhaus Seminarturm",
+      "wheelchair": true,
       "neighbours": [
         "Kleines Treppenhaus Hauptgebäude"
       ],
@@ -166,6 +167,7 @@
     },
     {
       "name": "Foyer",
+      "wheelchair": true,
       "neighbours": [
         "Kleines Treppenhaus Hauptgebäude"
       ],
