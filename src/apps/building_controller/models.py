@@ -51,7 +51,7 @@ class BuildingEntryPoint(EntryPoint):
 
 class StairCase:
     def __init__(self, name, floors: List[Floor], coord, entries: List[BuildingEntryPoint], blocked=None,
-                 neighbours=None):
+                 neighbours=None, wheelchair=False):
         self.name = name
         self.coord = coord
         self.entries = entries
@@ -59,6 +59,7 @@ class StairCase:
         self.rooms = []
         self.blocked = blocked
         self.neighbours = neighbours
+        self.wheelchair = wheelchair
 
     def add_room(self, room: Room):
         self.rooms.append(room)

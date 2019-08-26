@@ -56,10 +56,15 @@ class BuildingConfigController:
     def _get_staircase_neigbours(self, staircase: dict):
         return staircase.get("neighbours", None)
 
+    def _get_staircase_wheelchair(self, staircase: dict):
+        return staircase.get("wheelchair", False)
+
     def _get_staircase(self, staircase):
         return StairCase(self._get_staircase_name(staircase),
                          self._get_staircase_floors(staircase),
                          self._get_staircase_coord(staircase),
                          self._get_staircase_entry_points(staircase),
                          self._get_blocked_date(staircase),
-                         self._get_staircase_neigbours(staircase))
+                         self._get_staircase_neigbours(staircase),
+                         self._get_staircase_wheelchair(staircase),
+                         )
