@@ -35,8 +35,11 @@ class BuildingController:
         self.indoor_cc = BuildingConfigController()
 
     def get_rooms_staircase(self, room: Room, wheelchair=False) -> StairCase or None:
+        building = self.get_rooms_building(room)
+        return building.get_rooms_staircase(room) if building else None
+
+    def get_rooms_building(self, room: Room, wheelchair=False) -> Building or None:
         for building in self.indoor_cc.buildings:
-            # TODO: Add wheelchair option
             if str(building.key).lower() == str(room.building_key).lower():
-                return building.get_rooms_staircase(room)
+                return building
         return None
