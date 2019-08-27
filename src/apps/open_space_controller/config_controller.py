@@ -24,10 +24,10 @@ class OpenSpaceConfigController:
         with open(f'{self.config_dir}/{file}') as f:
             return {'file_name': file, 'geojson': json.load(f)}
 
-    def get_open_spaces_files(self):
+    def get_open_spaces_files(self) -> List:
         return [f for f in os.listdir(self.config_dir) if f.endswith('.geojson') or f.endswith('.json')]
 
-    def _get_geojsons(self):
+    def _get_geojsons(self) -> List[dict]:
         files = self.get_open_spaces_files()
         logger.info(f'FOUND {len(files)} geojsons')
         return [self.load_geojson(file) for file in files]
@@ -56,7 +56,7 @@ class OpenSpaceConfigController:
             return None
         return OpenSpace(data['file_name'], walkables[0], restricted, blocked, entry_points)
 
-    def _load_open_spaces(self):
+    def _load_open_spaces(self) -> List[OpenSpace]:
         return [self._load_open_space(geojson) for geojson in self._get_geojsons()]
 
     def get_open_space(self, file_name: str) -> OpenSpace or None:
@@ -67,3 +67,20 @@ class OpenSpaceConfigController:
 
     def get_open_spaces(self) -> List[OpenSpace]:
         return self.open_spaces
+
+    def set_open_space_colors(self):
+        for file in self.get_open_spaces_files():
+            geojson = self.load_geojson(file)
+            for feature in geojson['geojson']['features']:
+                polygon = feature['geometry']['coordinates'][0]
+                if "type" in feature['properties']:
+                    type = feature['properties']['type'].lower()
+                    if type == WALKABLE_TYPE.lower():
+                        feature['properties']['fill'] = "#0eae00"
+                        feature['properties']['fill-opacity'] = 0.2
+                    if type == RESTRICTED_TYPE.lower():
+                        feature['properties']['fill'] = "#e6b34e"
+                    if type == BLOCKED_TYPE.lower():
+                        feature['properties']['fill'] = "#d52d2d"
+            with open(f'{self.config_dir}/{file}', 'w') as f:
+                json.dump(geojson['geojson'], f)
