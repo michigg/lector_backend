@@ -9,8 +9,8 @@ logger = logging.getLogger(__name__)
 
 
 class GraphBuildingController:
-    def __init__(self, osmm):
-        self.indoor_cc = BuildingConfigController()
+    def __init__(self, osmm, building_cc=BuildingConfigController()):
+        self.building_cc = building_cc
         self.graph_buildings = None
         self.osmm = osmm
 

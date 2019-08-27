@@ -1,0 +1,48 @@
+{
+  "open_space": "markusplatz",
+  "building_id": "MG1",
+  "staircases": [
+    {
+      "name": "Haupttreppe",
+      "wheelchair": true,
+      "coord": [
+        10.882902145385742,
+        49.895249512228474
+      ],
+      "entries": [
+        {
+          "wheelchair": true,
+          "coord": [
+            10.882773399353027,
+            49.89526679066847
+          ]
+        },
+        {
+          "wheelchair": true,
+          "coord": [
+            10.882993340492249,
+            49.89514929715452
+          ]
+        }
+      ],
+      "floors": [
+        {
+          "level": 0,
+          "ranges": [[0, 999]]
+        },
+        {
+          "level": 1,
+          "ranges": [[0, 999]]
+        },
+        {
+          "level": 2,
+          "ranges": [[0, 999]]
+        },
+        {
+          "level": 3,
+          "ranges": [[0, 999]]
+        }
+      ]
+    }
+  ]
+}

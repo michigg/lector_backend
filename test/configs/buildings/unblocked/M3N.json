@@ -1,0 +1,137 @@
+{
+  "open_space": "markusplatz",
+  "building_id": "M3N",
+  "staircases": [
+    {
+      "name": "Turm",
+      "neighbours": [
+        "Haupttreppe"
+      ],
+      "coord": [
+        10.883663892745972,
+        49.89579550794111
+      ],
+      "entries": [
+        {
+          "wheelchair": false,
+          "coord": [
+            10.883620977401733,
+            49.89582315312931
+          ]
+        }
+      ],
+      "floors": [
+        {
+          "level": 0,
+          "ranges": [
+            [
+              25,
+              25
+            ]
+          ]
+        },
+        {
+          "level": 1,
+          "ranges": [
+            [
+              25,
+              25
+            ]
+          ]
+        },
+        {
+          "level": 2,
+          "ranges": [
+            [
+              25,
+              25
+            ]
+          ]
+        },
+        {
+          "level": 3,
+          "ranges": [
+            [
+              25,
+              25
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Haupttreppenhaus",
+      "wheelchair": true,
+      "neighbours": [
+        "Turm"
+      ],
+      "coord": [
+        10.883148908615112,
+        49.895678015714495
+      ],
+      "entries": [
+        {
+          "wheelchair": true,
+          "coord": [
+            10.883240103721617,
+            49.89574367317049
+          ]
+        },
+        {
+          "wheelchair": false,
+          "coord": [
+            10.883274972438812,
+            49.89569183834423
+          ]
+        }
+      ],
+      "floors": [
+        {
+          "level": -1,
+          "ranges": [
+            [
+              21,
+              28
+            ]
+          ]
+        },
+        {
+          "level": 0,
+          "ranges": [
+            [
+              26,
+              28
+            ]
+          ]
+        },
+        {
+          "level": 1,
+          "ranges": [
+            [
+              26,
+              42
+            ]
+          ]
+        },
+        {
+          "level": 2,
+          "ranges": [
+            [
+              26,
+              42
+            ]
+          ]
+        },
+        {
+          "level": 3,
+          "ranges": [
+            [
+              25,
+              30
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

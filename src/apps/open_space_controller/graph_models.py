@@ -63,60 +63,18 @@ class GraphOpenSpace(OpenSpace):
         self.remove_open_space_nodes()
         self._set_node_ids()
 
-    def is_open_space_walkable_node(self, node_id) -> bool:
-        return node_id in self.walkable_area_nodes
-
-    def get_open_space_restricted_area_id(self, node_id) -> int:
-        for index, restricted_area_nodes in enumerate(self.restricted_areas_nodes):
-            if node_id in restricted_area_nodes:
-                return index
-        return -1
-
-    def get_other_restricted_area_polys(self, restricted_area_poly: Polygon) -> List[Polygon]:
-        other_restricted_area_polys = self.restricted_area_polys.copy()
-        other_restricted_area_polys.remove(restricted_area_poly)
-        return other_restricted_area_polys
-
     def add_edge(self, from_id: int, to_id: int):
         self.edges.append([from_id, to_id])
         self.osmm.add_osm_edge(from_id, to_id, self.get_name())
 
-    def is_visible_edge(self, line) -> bool:
-        if self.is_internal_edge(line):
-            is_blocked = any(
-                [prep(blocked_area_poly).intersects(line) for blocked_area_poly in self.blocked_area_polys])
-            if is_blocked:
-                return False
-
-            for restriced_area_poly in self.restricted_area_polys:
-                prep_restriced_area_poly = prep(restriced_area_poly)
-
-                if prep_restriced_area_poly.touches(line) and not self.line_intersects_other_restricted_areas(line,
-                                                                                                              restriced_area_poly, ):
-                    return True
-                # Checked: is_blocked_line, is_restricted_line
-            is_restricted = self.is_restricted_line(line, self.restricted_area_polys)
-            if is_restricted:
-                return False
-            return True
-        return False
-
-    # Better naming Line that overlaps or contains line
-    def is_restricted_line(self, line: LineString, restricted_area_polys: List[Polygon]) -> bool:
-        return any([prep(restriced_area_poly).intersects(line) for
-                    restriced_area_poly in restricted_area_polys])
-
-    def is_internal_edge(self, line: LineString) -> bool:
-        return self.walkable_area_prep_poly.covers(line)
-
-    def line_intersects_other_restricted_areas(self, line: LineString, restricted_area_poly: Polygon) -> bool:
-        other_restricted_areas = self.get_other_restricted_area_polys(restricted_area_poly)
+    def edge_intersects_other_restricted_areas(self, line: LineString, restricted_area_poly: Polygon) -> bool:
+        other_restricted_areas = self._get_other_restricted_area_polys(restricted_area_poly)
         for other_restricted_area in other_restricted_areas:
-            other_areas = self.get_other_restricted_area_polys(other_restricted_area)
+            other_areas = self._get_other_restricted_area_polys(other_restricted_area)
             other_areas.remove(restricted_area_poly)
-            if prep(other_restricted_area).touches(line) and not self.is_restricted_line(line, other_areas):
+            if prep(other_restricted_area).touches(line) and not self._is_restricted_line(line, other_areas):
                 return False
-        return self.is_restricted_line(line, other_restricted_areas)
+        return self._is_restricted_line(line, other_restricted_areas)
 
     def add_visibility_graph_edges(self):
         nodes = self.get_all_nodes()
@@ -125,7 +83,7 @@ class GraphOpenSpace(OpenSpace):
                 if node_from < node_to:
                     new_possible_edge = LineString(
                         [self.osmm.get_coord_from_id(node_from), self.osmm.get_coord_from_id(node_to)])
-                    if self.is_visible_edge(new_possible_edge):
+                    if self._is_visible_edge(new_possible_edge):
                         self.add_edge(node_from, node_to)
 
     def add_walkable_edges(self):
@@ -151,35 +109,98 @@ class GraphOpenSpace(OpenSpace):
             self._remove_polygon_edges(blocked_area_nodes)
 
     def add_building_entry_to_open_space(self, entry_point):
-        if self.is_open_space_walkable_node(entry_point.graph_entry_edge[0]):
-            self.insert_sorted(entry_point.nearest_graph_node_id, entry_point.graph_entry_edge[0],
-                               self.walkable_area_nodes)
+        if self._is_open_space_walkable_node(entry_point.graph_entry_edge[0]):
+            self._insert_sorted(entry_point.nearest_graph_node_id, entry_point.graph_entry_edge[0],
+                                self.walkable_area_nodes)
             self.walkable_area_poly = Polygon(
                 [[self.osmm.graph.node[node]['x'], self.osmm.graph.node[node]['y']] for node in
                  self.walkable_area_nodes])
             self.walkable_area_prep_poly = prep(self.walkable_area_poly)
-        restricted_area_id = self.get_open_space_restricted_area_id(entry_point.graph_entry_edge[0])
-        if self.get_open_space_restricted_area_id(entry_point.graph_entry_edge[0]) > -1:
-            self.insert_sorted(entry_point.nearest_graph_node_id, entry_point.graph_entry_edge[0],
-                               self.restricted_areas_nodes[restricted_area_id])
+        restricted_area_id = self._get_open_space_restricted_area_id(entry_point.graph_entry_edge[0])
+        if self._get_open_space_restricted_area_id(entry_point.graph_entry_edge[0]) > -1:
+            self._insert_sorted(entry_point.nearest_graph_node_id, entry_point.graph_entry_edge[0],
+                                self.restricted_areas_nodes[restricted_area_id])
             self.restricted_area_polys[restricted_area_id] = Polygon(
                 [[self.osmm.graph.node[node]['x'], self.osmm.graph.node[node]['y']] for node in
                  self.restricted_areas_nodes[restricted_area_id]])
 
-    def insert_sorted(self, to_insert_node, node_before, nodes):
+    def get_name(self):
+        return f'Freifläche {os.path.splitext(self.file_name)[0].upper()}'
+
+    # Better naming all nodes without blocked space
+    def get_all_nodes(self) -> List[int]:
+        nodes = []
+        nodes.extend(self.walkable_area_nodes)
+        for restricted_area_nodes in self.restricted_areas_nodes:
+            nodes.extend(restricted_area_nodes)
+        return nodes
+
+    def remove_open_space_nodes(self):
+        nodes = [node for node, data in self.osmm.graph.nodes(data=True) if
+                 self.walkable_area_prep_poly.contains(Point(self.osmm.get_coord_from_id(node)))]
+        for node in nodes:
+            self.osmm.graph.remove_node(node)
+
+    def add_graph_entry_points(self):
+        for graph_entry_point in self.graph_entry_points:
+            graph_entry_point.add_edges()
+
+    def _is_open_space_walkable_node(self, node_id) -> bool:
+        return node_id in self.walkable_area_nodes
+
+    def _get_open_space_restricted_area_id(self, node_id) -> int:
+        for index, restricted_area_nodes in enumerate(self.restricted_areas_nodes):
+            if node_id in restricted_area_nodes:
+                return index
+        return -1
+
+    def _get_other_restricted_area_polys(self, restricted_area_poly: Polygon) -> List[Polygon]:
+        other_restricted_area_polys = self.restricted_area_polys.copy()
+        other_restricted_area_polys.remove(restricted_area_poly)
+        return other_restricted_area_polys
+
+    def _is_visible_edge(self, edge: LineString) -> bool:
+        if self._is_internal_edge(edge):
+            is_blocked = any([prep(blocked_poly).intersects(edge) for blocked_poly in self.blocked_area_polys])
+            if not is_blocked:
+                # Edge is not blocked
+                if not self._is_connected_on_restricted_area(edge):
+                    # Edge is not blocked and not restricted connected
+                    return not self._is_restricted_line(edge, self.restricted_area_polys)
+                else:
+                    # Edge is not blocked, but restriced connected
+                    return True
+        # Edge is not an internal edge, or blocked, or intersects restricted areas
+        return False
+
+    def _is_connected_on_restricted_area(self, line: LineString) -> bool:
+        for restriced_area_poly in self.restricted_area_polys:
+            prep_restriced_poly = prep(restriced_area_poly)
+            if prep_restriced_poly.touches(line) and not self.edge_intersects_other_restricted_areas(line,
+                                                                                                     restriced_area_poly, ):
+                return True
+        return False
+
+        # Better naming Line that overlaps or contains line
+
+    @staticmethod
+    def _is_restricted_line(line: LineString, restricted_area_polys: List[Polygon]) -> bool:
+        return any([prep(line).intersects(restriced_area_poly) for restriced_area_poly in restricted_area_polys])
+
+    def _is_internal_edge(self, line: LineString) -> bool:
+        return self.walkable_area_prep_poly.covers(line)
+
+    def _insert_sorted(self, to_insert_node, node_before, nodes):
         for index, node_id in enumerate(nodes):
             if node_id == node_before:
                 nodes.insert(index + 1, to_insert_node)
                 return
 
     def _set_node_ids(self):
-
         # Set Walkable Area Nodes
         self.walkable_area_nodes = [self.osmm.add_osm_node(point) for point in self.walkable_area_coords]
-
         self.graph_entry_points = [GraphOpenSpaceEntryPoint(entry_point, self.osmm, self) for entry_point in
                                    self.entry_points]
-        # self.get_entry_points()
 
         # Set Restricted Area Nodes
         for restricted_area_coords in self.restricted_areas_coords:
@@ -188,9 +209,6 @@ class GraphOpenSpace(OpenSpace):
         # Set Blocked Areas
         for blocked_area_coords in self.blocked_areas_nodes:
             self.blocked_areas_nodes.append([self.osmm.add_osm_node(coord) for coord in blocked_area_coords])
-
-    def get_name(self):
-        return f'Freifläche {os.path.splitext(self.file_name)[0].upper()}'
 
     def _set_polygon_edges(self, nodes):
         last_node = None
@@ -207,26 +225,6 @@ class GraphOpenSpace(OpenSpace):
                 self.osmm.graph.remove_edge(last_node, node)
             last_node = node
         self.osmm.graph.remove_edge(nodes[0], nodes[-1])
-
-    # Better naming all nodes without blocked space
-    def get_all_nodes(self) -> List[int]:
-        nodes = []
-        nodes.extend(self.walkable_area_nodes)
-        for restricted_area_nodes in self.restricted_areas_nodes:
-            nodes.extend(restricted_area_nodes)
-        return nodes
-
-    def remove_open_space_nodes(self):
-        # TODO better
-        # bbox = self.get_boundaries(boundary_degree_extension=-0.00035)
-        nodes = [node for node, data in self.osmm.graph.nodes(data=True) if
-                 self.walkable_area_prep_poly.contains(Point(self.osmm.get_coord_from_id(node)))]
-        for node in nodes:
-            self.osmm.graph.remove_node(node)
-
-    def add_graph_entry_points(self):
-        for graph_entry_point in self.graph_entry_points:
-            graph_entry_point.add_edges()
 
     def plot_areas(self):
         import matplotlib.pyplot as plt

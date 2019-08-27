@@ -3,10 +3,12 @@ from typing import List
 
 import osmnx as ox
 
+from apps.building_controller.config_controller import BuildingConfigController
 from apps.building_controller.controller import GraphBuildingController
+from apps.building_controller.models import Building
 from apps.open_space_controller.config_controller import OpenSpaceConfigController
 from apps.open_space_controller.graph_models import GraphOpenSpace
-from apps.open_space_controller.models import BBox
+from apps.open_space_controller.models import BBox, OpenSpace
 
 logger = logging.getLogger(__name__)
 
@@ -19,38 +21,44 @@ OSM_OUTPUT_DIR = "/osm_data"
 SERVICE_NAME = 'graphhopper'
 
 OPEN_SPACE_CONFIG_DIR = "/configs/open_spaces"
+BUILDING_CONFIG_DIR = "/configs/indoor_maps"
 
 
 class OSMController:
-    def __init__(self):
+    def __init__(self, open_space_config_dir=OPEN_SPACE_CONFIG_DIR, building_config_dir=BUILDING_CONFIG_DIR):
         self.graph = None
         self.current_osm_id = 0
-        self.osp_config_c = OpenSpaceConfigController(OPEN_SPACE_CONFIG_DIR)
-        self.indoor_map_c = GraphBuildingController(self)
+        self.osp_config_c = OpenSpaceConfigController(open_space_config_dir)
+        building_cc = BuildingConfigController(config_dir=building_config_dir)
+        self.indoor_map_c = GraphBuildingController(self, building_cc=building_cc)
 
     def create_seperate_open_spaces_plots(self):
         open_spaces = self.osp_config_c.get_open_spaces()
-        buildings = self.indoor_map_c.indoor_cc.get_buildings()
+        buildings = self.indoor_map_c.building_cc.get_buildings()
 
         for open_space in open_spaces:
             self.graph = self._download_open_space_network(open_space)
-            graph_open_space = self._insert_open_space(buildings, open_space)
+            graph_open_space = GraphOpenSpace(open_space, osmm=self)
+            self._insert_open_space(buildings, graph_open_space)
             self.plot_graph(output_dir="/osm_data", file_name=graph_open_space.file_name, minimized=False)
 
     def create_bbox_open_spaces_plot(self):
         open_spaces = self.osp_config_c.get_open_spaces()
-        buildings = self.indoor_map_c.indoor_cc.get_buildings()
+        buildings = self.indoor_map_c.building_cc.get_buildings()
         self.graph = self.download_map()
 
         for open_space in open_spaces:
-            self._insert_open_space(buildings, open_space)
+            graph_open_space = GraphOpenSpace(open_space, osmm=self)
+            self._insert_open_space(buildings, graph_open_space)
         self.plot_graph()
 
-    def create_open_space_plot(self, open_space, output_dir="/osm_data"):
-        buildings = self.indoor_map_c.indoor_cc.get_buildings()
-        self.graph = self.download_map(open_space.get_boundaries(boundary_degree_extension=0.0005))
-        graph_open_space = self._insert_open_space(buildings, open_space)
-        self.plot_graph(output_dir=output_dir, file_name=graph_open_space.file_name, minimized=False)
+    def create_complete_open_space_plot(self, open_space, output_dir="/osm_data", file_name=None):
+        buildings = self.indoor_map_c.building_cc.get_buildings()
+        graph_open_space = self._init_open_space_graph(open_space)
+        self._insert_open_space(buildings, graph_open_space)
+        self.plot_graph(output_dir=output_dir,
+                        file_name=file_name if file_name else graph_open_space.file_name,
+                        minimized=False)
 
     def download_map(self, bbox: BBox = BAMBERG_BBOX):
         return ox.graph_from_bbox(*bbox.get_bbox(), simplify=False)
@@ -135,12 +143,84 @@ class OSMController:
                     graph_open_space.add_building_entry_to_open_space(entry)
         self.plot_graph(output_dir="/osm_data", file_name=f'{graph_open_space.file_name}_building', minimized=False)
 
-    def _insert_open_space(self, buildings, open_space):
-        open_space.set_buildings(buildings)
-        graph_open_space = GraphOpenSpace(open_space, osmm=self)
-        # Insert Building Nodes
+    def _insert_open_space(self, buildings: List[Building], graph_open_space: GraphOpenSpace):
+        self._instert_open_space_buildings(buildings, graph_open_space)
+        self._insert_open_space_visibility_graph(graph_open_space)
+        self._insert_open_space_entries(graph_open_space)
+
+    def _instert_open_space_buildings(self, buildings: List[Building], graph_open_space: GraphOpenSpace):
+        graph_open_space.set_buildings(buildings)
         self._insert_building_to_graph(graph_open_space)
-        # Generate Visibility graph
+
+    def _insert_open_space_walkable(self, graph_open_space: GraphOpenSpace):
+        graph_open_space.add_walkable_edges()
+
+    def _insert_open_space_restricted(self, graph_open_space: GraphOpenSpace):
+        graph_open_space.add_restricted_area_edges()
+
+    def _insert_open_space_visibility_graph(self, graph_open_space: GraphOpenSpace):
         graph_open_space.add_visibility_graph_edges()
+
+    def _insert_open_space_entries(self, graph_open_space: GraphOpenSpace):
         graph_open_space.add_graph_entry_points()
+
+    def create_open_space_walkable_plot(self, open_space, output_dir="/osm_data", file_name=None):
+        graph_open_space = self._init_open_space_graph(open_space)
+        self._insert_open_space_walkable(graph_open_space)
+        self.plot_graph(output_dir=output_dir,
+                        file_name=file_name if file_name else graph_open_space.file_name,
+                        minimized=False)
+
+    def create_open_space_restricted_plot(self, open_space, output_dir="/osm_data", file_name=None):
+        graph_open_space = self._init_open_space_graph(open_space)
+        self._insert_open_space_restricted(graph_open_space)
+        self.plot_graph(output_dir=output_dir,
+                        file_name=file_name if file_name else graph_open_space.file_name,
+                        minimized=False)
+
+    def create_open_space_visibility_graph_plot(self, open_space, output_dir="/osm_data", file_name=None):
+        graph_open_space = self._init_open_space_graph(open_space)
+        self._insert_open_space_visibility_graph(graph_open_space)
+        self.plot_graph(output_dir=output_dir,
+                        file_name=file_name if file_name else graph_open_space.file_name,
+                        minimized=False)
+
+    def create_open_space_entries_plot(self, open_space, output_dir="/osm_data", file_name=None):
+        graph_open_space = self._init_open_space_graph(open_space)
+        self._insert_open_space_entries(graph_open_space)
+        self.plot_graph(output_dir=output_dir,
+                        file_name=file_name if file_name else graph_open_space.file_name,
+                        minimized=False)
+
+    def create_open_space_walkable_restricted_plot(self, open_space, output_dir="/osm_data", file_name=None):
+        graph_open_space = self._init_open_space_graph(open_space)
+        self._insert_open_space_walkable(graph_open_space)
+        self._insert_open_space_restricted(graph_open_space)
+        self.plot_graph(output_dir=output_dir,
+                        file_name=file_name if file_name else graph_open_space.file_name,
+                        minimized=False)
+
+    def create_open_space_walkable_restricted_entries_plot(self, open_space, output_dir="/osm_data", file_name=None):
+        graph_open_space = self._init_open_space_graph(open_space)
+        self._insert_open_space_walkable(graph_open_space)
+        self._insert_open_space_restricted(graph_open_space)
+        self._insert_open_space_entries(graph_open_space)
+        self.plot_graph(output_dir=output_dir,
+                        file_name=file_name if file_name else graph_open_space.file_name,
+                        minimized=False)
+
+    def create_open_space_buildings_plot(self, open_space: OpenSpace, buildings: [], output_dir="/osm_data",
+                                         file_name=None):
+        graph_open_space = self._init_open_space_graph(open_space)
+        self._instert_open_space_buildings( buildings, graph_open_space)
+        self._insert_open_space_walkable(graph_open_space)
+        self._insert_open_space_restricted(graph_open_space)
+        self._insert_open_space_entries(graph_open_space)
+        self.plot_graph(output_dir=output_dir,
+                        file_name=file_name if file_name else graph_open_space.file_name,
+                        minimized=False)
+
+    def _init_open_space_graph(self, open_space):
+        self.graph = self.download_map(open_space.get_boundaries(boundary_degree_extension=0.0005))
+        graph_open_space = GraphOpenSpace(open_space, osmm=self)
         return graph_open_space

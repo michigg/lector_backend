@@ -1,0 +1,153 @@
+{
+  "open_space": "markusplatz",
+  "building_id": "M3",
+  "staircases": [
+    {
+      "name": "Turm",
+      "neighbours": [
+        "Haupttreppe"
+      ],
+      "coord": [
+        10.883663892745972,
+        49.89579550794111
+      ],
+      "entries": [
+        {
+          "wheelchair": false,
+          "coord": [
+            10.883620977401733,
+            49.89582315312931
+          ]
+        }
+      ],
+      "floors": [
+        {
+          "level": 0,
+          "ranges": [
+            [
+              16,
+              19
+            ]
+          ]
+        },
+        {
+          "level": 1,
+          "ranges": [
+            [
+              14,
+              19
+            ]
+          ]
+        },
+        {
+          "level": 2,
+          "ranges": [
+            [
+              14,
+              19
+            ]
+          ]
+        },
+        {
+          "level": 3,
+          "ranges": [
+            [
+              14,
+              19
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Haupttreppe",
+      "wheelchair": true,
+      "neighbours": [
+        "Turm"
+      ],
+      "coord": [
+        10.883814096450806,
+        49.89561235816914
+      ],
+      "entries": [
+        {
+          "wheelchair": false,
+          "coord": [
+            10.88393747806549,
+            49.89569874965762
+          ]
+        },
+        {
+          "wheelchair": false,
+          "coord": [
+            10.883757770061493,
+            49.895605446843355
+          ]
+        }
+      ],
+      "floors": [
+        {
+          "level": -1,
+          "ranges": [
+            [
+              0,
+              19
+            ]
+          ]
+        },
+        {
+          "level": 0,
+          "ranges": [
+            [
+              0,
+              13
+            ],
+            [
+              20,
+              21
+            ]
+          ]
+        },
+        {
+          "level": 1,
+          "ranges": [
+            [
+              0,
+              13
+            ],
+            [
+              20,
+              21
+            ]
+          ]
+        },
+        {
+          "level": 2,
+          "ranges": [
+            [
+              0,
+              13
+            ],
+            [
+              20,
+              21
+            ]
+          ]
+        },
+        {
+          "level": 3,
+          "ranges": [
+            [
+              0,
+              13
+            ],
+            [
+              20,
+              21
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

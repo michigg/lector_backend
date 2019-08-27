@@ -31,9 +31,9 @@ class ApiOpenSpacePlot(views.APIView):
                 hours=settings.OPEN_SPACE_MAX_CACHING_TIME)
 
             if creation_time < max_creation_time:
-                osmm.create_open_space_plot(open_space, settings.MEDIA_ROOT)
+                osmm.create_complete_open_space_plot(open_space, settings.MEDIA_ROOT)
         except FileNotFoundError as err:
-            osmm.create_open_space_plot(open_space, settings.MEDIA_ROOT)
+            osmm.create_complete_open_space_plot(open_space, settings.MEDIA_ROOT)
 
         return Response({"url": f'{settings.MEDIA_URL}{open_space.file_name}.svg'},
                         status=status.HTTP_200_OK, headers={'access-control-allow-origin': '*'})
