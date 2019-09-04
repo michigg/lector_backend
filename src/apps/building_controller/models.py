@@ -56,14 +56,9 @@ class StairCase:
         self.coord = coord
         self.entries = entries
         self.floors = floors
-        self.rooms = []
         self.blocked = blocked
         self.neighbours = neighbours
         self.wheelchair = wheelchair
-
-    def add_room(self, room: Room):
-        self.rooms.append(room)
-        self.rooms.sort(key=lambda x: x.number)
 
     def is_staircase_room(self, room: Room):
         for floor in self.floors:
@@ -71,15 +66,11 @@ class StairCase:
                 return True
         return False
 
-    def get_not_blocked_entries(self):
-        if self.is_blocked():
-            return []
-        return [entry for entry in self.entries if not entry.is_blocked()]
+    def get_not_blocked_entries(self) -> List[BuildingEntryPoint]:
+        return [entry for entry in self.entries if not entry.is_blocked()] if self.is_blocked() else []
 
     def is_blocked(self):
-        if self.blocked:
-            return datetime.now() < self.blocked
-        return False
+        return datetime.now() < self.blocked if self.blocked else False
 
     def __str__(self):
         output = f'Staircase {self.name}\n'
@@ -93,7 +84,7 @@ class Building:
         self.key = key
         self.staircases = staircases
 
-    def get_rooms_staircase(self, room: Room):
+    def get_rooms_staircase(self, room: Room) -> StairCase or None:
         for staircase in self.staircases:
             if staircase.is_staircase_room(room):
                 return staircase

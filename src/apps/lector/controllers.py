@@ -32,16 +32,6 @@ class OSMController:
         building_cc = BuildingConfigController(config_dir=building_config_dir)
         self.indoor_map_c = GraphBuildingController(self, building_cc=building_cc)
 
-    def create_seperate_open_spaces_plots(self):
-        open_spaces = self.osp_config_c.get_open_spaces()
-        buildings = self.indoor_map_c.building_cc.get_buildings()
-
-        for open_space in open_spaces:
-            self.graph = self._download_open_space_network(open_space)
-            graph_open_space = GraphOpenSpace(open_space, osmm=self)
-            self._insert_open_space(buildings, graph_open_space)
-            self.plot_graph(output_dir="/osm_data", file_name=graph_open_space.file_name, minimized=False)
-
     def create_bbox_open_spaces_plot(self):
         open_spaces = self.osp_config_c.get_open_spaces()
         buildings = self.indoor_map_c.building_cc.get_buildings()
@@ -118,15 +108,9 @@ class OSMController:
     def get_nearest_edge(self, coord):
         return ox.get_nearest_edge(self.graph, coord[::-1])
 
-    def get_nearest_point(self, coord):
-        return ox.get_nearest_node(self.graph, coord[::-1])
-
     def get_coord_from_id(self, node_id):
         node = self.graph.node[node_id]
         return [node['x'], node['y']]
-
-    def _download_open_space_network(self, open_space):
-        return self.download_map(open_space.get_boundaries(boundary_degree_extension=0.001))
 
     def _insert_building_to_graph(self, graph_open_space):
         graph_open_space.add_walkable_edges()
@@ -212,7 +196,7 @@ class OSMController:
     def create_open_space_buildings_plot(self, open_space: OpenSpace, buildings: [], output_dir="/osm_data",
                                          file_name=None):
         graph_open_space = self._init_open_space_graph(open_space)
-        self._instert_open_space_buildings( buildings, graph_open_space)
+        self._instert_open_space_buildings(buildings, graph_open_space)
         self._insert_open_space_walkable(graph_open_space)
         self._insert_open_space_restricted(graph_open_space)
         self._insert_open_space_entries(graph_open_space)

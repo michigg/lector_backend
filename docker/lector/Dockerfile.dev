@@ -37,5 +37,4 @@ WORKDIR /lector
 
 EXPOSE 80
 
-ENTRYPOINT ["python3", "manage.py"]
-CMD ["runserver", "0.0.0.0:80"]
+CMD ["python3", "manage.py", "runserver", "0.0.0.0:80"]

@@ -19,16 +19,15 @@ class ApiVGNConnection(views.APIView):
     def get(self, request):
         from_lat = request.GET.get('from_lat', None)
         from_lon = request.GET.get('from_lon', None)
-        building_key = request.GET.get('building_key', None)
-        level = request.GET.get('level', None)
-        number = request.GET.get('number', None)
+        to_lat = request.GET.get('to_lat', None)
+        to_lon = request.GET.get('to_lon', None)
 
-        if from_lat and from_lon and building_key and level and number:
+
+        if from_lat and from_lon and to_lat and to_lon:
             vgn_c = VGNCoordController()
-            staircase_coord = vgn_c.get_rooms_staircase_coord(building_key, level, number)
 
             from_coord = vgn_c.get_vgn_coord(from_lon, from_lat)
-            to_coord = vgn_c.get_vgn_coord(staircase_coord[0], staircase_coord[1])
+            to_coord = vgn_c.get_vgn_coord(to_lon, to_lat)
 
             if from_coord and to_coord:
                 return Response(

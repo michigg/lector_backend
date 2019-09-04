@@ -1,0 +1,67 @@
+{
+  "before": [
+    {
+      "univis_key": "Lecture.wiai.bereic.lehrst.1",
+      "name": "KInf-MobAss-M: Mobile Assistence Systems Praktikum",
+      "type": {
+        "id": "EXERCISE",
+        "value": "Übung"
+      },
+      "orgname": "Lehrstuhl für Angewandte Informatik in den Kultur-, Geschichts- und Geowissenschaften",
+      "terms": [
+        {
+          "starttime": "1900-01-01T10:00:00+00:53",
+          "endtime": "1900-01-01T12:00:00+00:53",
+          "room": {
+            "univis_key": "Room.wiai.zentr.zentr.003_7",
+            "building_key": "WE5",
+            "number": 3,
+            "level": 1
+          }
+        }
+      ],
+      "lecturers": [
+        {
+          "univis_key": "Person.wiai.bereic.lehrst.klugcl",
+          "title": "M.S.",
+          "first_name": "Clemens",
+          "last_name": "Klug"
+        }
+      ],
+      "parent_lecture": {
+        "univis_key": "Lecture.wiai.bereic.lehrst.8",
+        "name": "KInf-MobAss-M: Mobile Assistence Systems"
+      }
+    }, {
+      "univis_key": "Lecture.wiai.bereic.lehrst.8",
+      "name": "KInf-MobAss-M: Mobile Assistence Systems",
+      "type": {
+        "id": "LECTURE",
+        "value": "Vorlesung"
+      },
+      "orgname": "Lehrstuhl für Angewandte Informatik in den Kultur-, Geschichts- und Geowissenschaften",
+      "terms": [
+        {
+          "starttime": "1900-01-01T12:00:00+00:53",
+          "endtime": "1900-01-01T14:00:00+00:53",
+          "room": {
+            "univis_key": "Room.wiai.zentr.zentr.003_0",
+            "building_key": "WE5",
+            "number": 3,
+            "level": 4
+          }
+        }
+      ],
+      "lecturers": [
+        {
+          "univis_key": "Person.wiai.bereic.lehrst.schlie",
+          "title": null,
+          "first_name": "Christoph",
+          "last_name": "Schlieder"
+        }
+      ],
+      "parent_lecture": null
+    }
+  ],
+  "after": []
+}

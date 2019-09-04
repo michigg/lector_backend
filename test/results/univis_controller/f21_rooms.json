@@ -1,0 +1,88 @@
+[
+  {
+    "univis_key": "Room.sowi.zentr.zentr.f135",
+    "building_key": "F21",
+    "number": 35,
+    "level": 1
+  }, {
+  "univis_key": "Room.sowi.zentr.zentr.f137",
+  "building_key": "F21",
+  "number": 37,
+  "level": 1
+}, {
+  "univis_key": "Room.sowi.zentr.zentr.f157",
+  "building_key": "F21",
+  "number": 57,
+  "level": 1
+}, {
+  "univis_key": "Room.sowi.zentr.zentr.f218",
+  "building_key": "F21",
+  "number": 18,
+  "level": 2
+}, {
+  "univis_key": "Room.sowi.zentr.zentr.f231",
+  "building_key": "F21",
+  "number": 31,
+  "level": 2
+}, {
+  "univis_key": "Room.sowi.zentr.zentr.f241",
+  "building_key": "F21",
+  "number": 41,
+  "level": 2
+}, {
+  "univis_key": "Room.sowi.zentr.zentr.0255",
+  "building_key": "F21",
+  "number": 55,
+  "level": 2
+}, {
+  "univis_key": "Room.sowi.zentr.zentr.f301",
+  "building_key": "F21",
+  "number": 1,
+  "level": 3
+}, {
+  "univis_key": "Room.sowi.zentr.zentr.f302",
+  "building_key": "F21",
+  "number": 2,
+  "level": 3
+}, {
+  "univis_key": "Room.sowi.zentr.zentr.f303",
+  "building_key": "F21",
+  "number": 3,
+  "level": 3
+}, {
+  "univis_key": "Room.sowi.zentr.zentr.f348",
+  "building_key": "F21",
+  "number": 48,
+  "level": 3
+}, {
+  "univis_key": "Room.sowi.zentr.zentr.f349",
+  "building_key": "F21",
+  "number": 50,
+  "level": 3
+}, {
+  "univis_key": "Room.sowi.zentr.zentr.f379",
+  "building_key": "F21",
+  "number": 79,
+  "level": 3
+}, {
+  "univis_key": "Room.sowi.zentr.zentr.f380",
+  "building_key": "F21",
+  "number": 80,
+  "level": 3
+}, {
+  "univis_key": "Room.sowi.zentr.zentr.f381",
+  "building_key": "F21",
+  "number": 81,
+  "level": 3
+}, {
+  "univis_key": "Room.sowi.zentr.zentr.f383",
+  "building_key": "F21",
+  "number": 83,
+  "level": 3
+}, {
+  "univis_key": "Room.sowi.zentr.zentr.f384",
+  "building_key": "F21",
+  "number": 84,
+  "level": 3
+}
+]

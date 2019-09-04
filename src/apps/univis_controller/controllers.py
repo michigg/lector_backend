@@ -72,7 +72,7 @@ class UnivISLectureController(UnivISController):
 
     def get_lectures_by_token(self, token: str):
         data = self.load_page(self._get_univis_api_url(token))
-        if data:
+        if data and 'UnivIS' in data and 'Lecture' in data['UnivIS']:
             lectures = self.get_lectures(data, self.get_rooms(data))
             lecture_map = self.get_univis_key_dict(lectures)
             person_map = self.get_univis_key_dict(self.get_persons(data))
@@ -102,6 +102,13 @@ class UnivISLectureController(UnivISController):
 
     def get_lectures_sorted_by_starttime(self, lectures):
         return sorted(lectures, key=lambda lecture: lecture.get_first_term().starttime)
+
+    # TODO: Implement child lectures. Currently not used
+    # def get_lecture_map_by_univis_id(self, lectures: List[Lecture]):
+    #     lecture_map = {}
+    #     for lecture in lectures:
+    #         lecture_map[lecture.univis_key] = lecture
+    #     return lecture_map
 
 
 class UnivISRoomController(UnivISController):

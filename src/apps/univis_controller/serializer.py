@@ -35,6 +35,9 @@ class PersonSerializer(serializers.Serializer):
     first_name = serializers.CharField(read_only=True, max_length=100)
     last_name = serializers.CharField(read_only=True, max_length=100)
 
+class MinimalLectureSerializer(serializers.Serializer):
+    univis_key = serializers.CharField(read_only=True, max_length=1)
+    name = serializers.CharField(read_only=True, max_length=100)
 
 class LectureSerializer(serializers.Serializer):
     univis_key = serializers.CharField(read_only=True, max_length=1)
@@ -44,7 +47,7 @@ class LectureSerializer(serializers.Serializer):
     terms = LectureTermSerializer(many=True)
     lecturers = PersonSerializer(many=True)
     parent_lecture_ref = serializers.CharField(read_only=True, max_length=100)
-    parent_lecture = serializers.CharField(read_only=True, max_length=100)
+    parent_lecture = MinimalLectureSerializer(many=False)
 
 
 class SplittedLectureSerializer(serializers.Serializer):

@@ -16,7 +16,8 @@ class UnivISRoom(Room):
         Room.__init__(self, building_key, level, number)
         self.univis_key = univis_room['@key']
 
-    def _init_room_number(self, univis_room) -> (str, int, int):
+    @staticmethod
+    def _init_room_number(univis_room) -> (str, int, int):
         splitted_room_id = str(univis_room['short']).split('/')
         splitted_room_number = splitted_room_id[1].split('.')
         building_key = splitted_room_id[0]
@@ -67,18 +68,11 @@ class LectureTerm:
 class Lecture:
     def __init__(self, univis_lecture: dict, rooms: List[UnivISRoom]):
         terms = [term[1] for term in list(univis_lecture['terms'].items())][0]
-        if type(terms) is list:
-            terms = [dict(term) for term in terms]
-        else:
-            terms = [dict(terms)]
-
+        terms = [dict(term) for term in terms] if type(terms) is list else [dict(terms)]
         dozs = []
         if 'dozs' in univis_lecture:
             dozs = [doz[1] for doz in list(univis_lecture['dozs'].items())][0]
-            if type(dozs) is list:
-                dozs = [dict(doz['UnivISRef']) for doz in dozs]
-            else:
-                dozs = [dict(dozs['UnivISRef'])]
+            dozs = [dict(doz['UnivISRef']) for doz in dozs] if type(dozs) is list else [dict(dozs['UnivISRef'])]
 
         self.univis_key = univis_lecture.get('@key')
         self._init_lecture_terms(rooms, terms)
@@ -99,7 +93,8 @@ class Lecture:
                     lecture_terms.append(LectureTerm(term, rooms[0]))
         self.terms = lecture_terms
 
-    def _get_type(self, univis_type):
+    @staticmethod
+    def _get_type(univis_type: str) -> LectureType or None:
         types = {'V': LectureType.LECTURE, 'Ü': LectureType.EXERCISE, 'TU': LectureType.TUTORIUM,
                  'S': LectureType.SEMINAR, 'SL': LectureType.FURTHER_LECTURE, 'S/PS': LectureType.SEMINAR_PRO_SEMINAR,
                  'PS/Ü': LectureType.PRO_SEMINAR_EXERCISE, 'PS': LectureType.PRO_SEMINAR,
@@ -115,22 +110,18 @@ class Lecture:
         return types[univis_type] if univis_type in types else None
 
     def get_first_term(self) -> List[LectureTerm] or None:
-        sorted_terms = sorted(self.terms, key=lambda x: x.starttime)
-        if len(sorted_terms) > 0:
-            return sorted_terms[0]
-        return None
+        sorted_terms = self._get_sorted_terms()
+        return sorted_terms[0] if len(sorted_terms) > 0 else None
 
     def get_last_term(self) -> List[LectureTerm] or None:
-        sorted_terms = sorted(self.terms, key=lambda x: x.starttime)
-        if len(sorted_terms) > 0:
-            return sorted_terms[-1]
-        return None
+        sorted_terms = self._get_sorted_terms()
+        return sorted_terms[-1] if len(sorted_terms) > 0 else None
+
+    def _get_sorted_terms(self) -> List[LectureTerm]:
+        return sorted(self.terms, key=lambda x: x.starttime)
 
     def get_rooms(self):
-        rooms = []
-        for term in self.terms:
-            rooms.append(term.room)
-        return rooms
+        return [term.room for term in self.terms]
 
     def __str__(self):
         if self.parent_lecture:
