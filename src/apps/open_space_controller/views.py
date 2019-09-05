@@ -48,12 +48,12 @@ class ApiListOpenSpaceGeoJson(views.APIView):
 @permission_classes((AllowAny,))
 class ApiListOpenSpaceConfig(views.APIView):
     def get(self, request, file_name):
-        open_space_c = OpenSpaceConfigController()
-        open_space_c = open_space_c.get_open_space(file_name)
+        open_space_cc = OpenSpaceConfigController()
+        open_space = open_space_cc.get_open_space(file_name)
         building_c = BuildingConfigController()
-        open_space_c.set_buildings(building_c.buildings)
-        if open_space_c:
-            logger.warn(open_space_c.__dict__)
-            return Response(open_space_c.get_minimal_dict(), status=status.HTTP_200_OK,
+        open_space.set_buildings(building_c.buildings)
+        if open_space:
+            return Response(open_space.get_minimal_dict(),
+                            status=status.HTTP_200_OK,
                             headers={'access-control-allow-origin': '*'})
         return Response(status=status.HTTP_400_BAD_REQUEST, headers={'access-control-allow-origin': '*'})

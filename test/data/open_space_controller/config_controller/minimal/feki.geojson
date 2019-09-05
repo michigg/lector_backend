@@ -1,0 +1,148 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "WALKABLE"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              10.90245008468628,
+              49.908267062844295
+            ],
+            [
+              10.902847051620483,
+              49.90777821234866
+            ],
+            [
+              10.90245008468628,
+              49.908267062844295
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "RESTRICTED"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              10.903726816177384,
+              49.90669339567286
+            ],
+            [
+              10.903995037078857,
+              49.906373819229145
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "RESTRICTED"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              10.905743837356567,
+              49.9067504009781
+            ],
+            [
+              10.90479701757431,
+              49.90643773468725
+            ],
+            [
+              10.905743837356567,
+              49.9067504009781
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "BLOCKED"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              10.904405415058136,
+              49.908685086546825
+            ],
+            [
+              10.90417206287384,
+              49.90864190244783
+            ],
+            [
+              10.904405415058136,
+              49.908685086546825
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "BLOCKED"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              10.90440809726715,
+              49.90866954027564
+            ],
+            [
+              10.90440809726715,
+              49.90866954027564
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "ENTRY"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.903171598911285,
+          49.907197803913526
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "ENTRY"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.903244018554688,
+          49.90710452333503
+        ]
+      }
+    }
+  ]
+}

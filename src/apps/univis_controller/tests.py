@@ -4,7 +4,7 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 from django.conf import settings
 
-PLOT_OUTPUT_DIR = "/test/results/univis_controller"
+TEST_DATA_DIR = "/test/data/univis_controller"
 
 
 # Create your tests here.
@@ -16,8 +16,9 @@ class UnivisControllerRoomsApiTest(TestCase):
         response = self.client.get('/api/v1/univis/rooms/',
                                    {'token': 'f21'},
                                    format='json')
-        with open(f'{PLOT_OUTPUT_DIR}/f21_rooms.json', 'r') as f:
+        with open(f'{TEST_DATA_DIR}/f21_rooms.json', 'r') as f:
             expected_rooms_json = json.load(f)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, expected_rooms_json)
 
     def test_with_empty_token(self):
@@ -37,8 +38,9 @@ class UnivisControllerLecturesApiTest(TestCase):
         response = self.client.get('/api/v1/univis/lectures/',
                                    {'token': 'mobass'},
                                    format='json')
-        with open(f'{PLOT_OUTPUT_DIR}/mobass_lectures.json', 'r') as f:
+        with open(f'{TEST_DATA_DIR}/mobass_lectures.json', 'r') as f:
             expected_lectures_json = json.load(f)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, expected_lectures_json)
 
     def test_with_token_results_in_no_content(self):

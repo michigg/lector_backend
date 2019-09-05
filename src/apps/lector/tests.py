@@ -11,8 +11,8 @@ BLOCKED_OPEN_SPACE_FILE_NAME = "markusplatz_blocked.geojson"
 
 class GraphTests(TestCase):
     def setUp(self):
-        self.osmm = OSMController(open_space_config_dir="/test/configs/open_spaces",
-                                  building_config_dir="/test/configs/buildings/unblocked")
+        self.osmm = OSMController(open_space_config_dir="/test/data/open_spaces",
+                                  building_config_dir="/test/data/buildings/unblocked")
 
     def test_open_space_entries(self):
         open_space = self.osmm.osp_config_c.get_open_space(OPEN_SPACE_FILE_NAME)
@@ -76,8 +76,8 @@ class GraphTests(TestCase):
                                                    file_name=f'07_-_test_open_space_buildings_-_{open_space.file_name}')
 
     def test_open_space_buildings_blocked_staircase_and_entries(self):
-        osmm = OSMController(open_space_config_dir="/test/configs/open_spaces",
-                             building_config_dir="/test/configs/buildings/blocked")
+        osmm = OSMController(open_space_config_dir="/test/data/open_spaces",
+                             building_config_dir="/test/data/buildings/blocked")
         buildings = osmm.indoor_map_c.building_cc.get_buildings()
         open_space = osmm.osp_config_c.get_open_space(OPEN_SPACE_FILE_NAME)
         osmm.create_open_space_buildings_plot(open_space, buildings,

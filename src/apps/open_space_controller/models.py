@@ -57,3 +57,11 @@ class OpenSpace:
                 "entry_points": len(self.entry_points),
                 "buildings": len(buildings)
                 }
+
+    def __eq__(self, other):
+        return self.file_name == other.file_name \
+               and self.walkable_area_coords == other.walkable_area_coords \
+               and self.restricted_areas_coords == other.restricted_areas_coords \
+               and self.blocked_areas_coords == other.blocked_areas_coords \
+               and self.entry_points == other.entry_points \
+               and self.buildings == other.buildings
