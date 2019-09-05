@@ -44,9 +44,7 @@ class ApiRooms(views.APIView):
         if search_token:
             univis_room_c = UnivISRoomController()
             rooms = sorted(univis_room_c.get_tokens_rooms(token=search_token), key=lambda room: room.__str__())
-            room_dicts = []
-            for room in rooms:
-                room_dicts.append(room.__dict__)
+            room_dicts = [room.__dict__ for room in rooms]
             results = RoomSerializer(room_dicts, many=True).data
             return Response(results, status=status.HTTP_200_OK, headers={'access-control-allow-origin': '*'})
         else:
