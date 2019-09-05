@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 class UnivISController:
     def __init__(self):
-        self.room_regex = "([a-zA-Z]*[0-9]*)\/([0-9]{2})\.([0-9]{2,3}).*"
+        self.room_regex = "([a-zA-Z0-9]*)\/([0-9]{2})\.([0-9]{2,3}).*"
 
     def load_page(self, url: str):
         data = requests.get(url).content
@@ -34,6 +34,7 @@ class UnivISController:
             return False
 
     def get_rooms_from_data(self, data: List):
+        logger.error([self.is_a_room(room) for room in data])
         return [UnivISRoom(room) for room in data if self.is_a_room(room)]
 
 
