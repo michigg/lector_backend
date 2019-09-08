@@ -20,8 +20,8 @@ OSM_OUTPUT_FILENAME = "data"
 OSM_OUTPUT_DIR = "/osm_data"
 SERVICE_NAME = 'graphhopper'
 
-OPEN_SPACE_CONFIG_DIR = "/data/open_spaces"
-BUILDING_CONFIG_DIR = "/data/indoor_maps"
+OPEN_SPACE_CONFIG_DIR = "/configs/open_spaces"
+BUILDING_CONFIG_DIR = "/configs/indoor_maps"
 
 
 class OSMController:
