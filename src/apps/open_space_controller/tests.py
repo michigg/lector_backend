@@ -1,6 +1,8 @@
 import json
 
 from django.test import TestCase
+from django.urls import reverse
+from rest_framework.test import APIClient
 
 from apps.lector.models import EntryPoint
 from apps.open_space_controller.config_controller import OpenSpaceConfigController
@@ -10,16 +12,21 @@ TEST_DIR = "/test/data/open_space_controller"
 
 
 # Create your tests here.
-# class OpenSpaceControllerApiTest(TestCase):
-#     def setUp(self) -> None:
-#         self.client = APIClient()
-#
-#     def test_open_space_api_(self):
-#         url = reverse('open-spaces')
-#         response = self.client.get(url, format='json')
-#         with open(f'{PLOT_OUTPUT_DIR}/f21_rooms.json', 'r') as f:
-#             expected_rooms_json = json.load(f)
-#         self.assertEqual(response.data, expected_rooms_json)
+class OpenSpaceControllerApiTest(TestCase):
+    def load_json(self, file_name) -> dict:
+        with open(f'{TEST_DIR}/api/{file_name}', 'r') as f:
+            return json.load(f)
+
+    def setUp(self) -> None:
+        self.client = APIClient()
+
+    def test_movement_types(self):
+        url = reverse('movement-types')
+        response = self.client.get(url, format='json')
+        expected_data = self.load_json('')
+        self.assertEqual(response.data, )
+
+
 #
 #     def test_with_empty_token(self):
 #         response = self.client.get('/api/v1/univis/rooms/', {'token': ''}, format='json')

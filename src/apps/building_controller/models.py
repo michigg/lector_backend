@@ -35,7 +35,7 @@ class Floor:
 class BuildingEntryPoint(EntryPoint):
     def __init__(self, data: dict):
         super().__init__(data['coord'])
-        self.wheelchair = data['wheelchair']
+        self.wheelchair = data.get('wheelchair', False)
         self.blocked = None
         if 'blocked' in data:
             self.blocked = datetime.strptime(data['blocked'], "%Y-%m-%d")

@@ -18,14 +18,6 @@ Author: Michael Götz
 
 
 @permission_classes((AllowAny,))
-class ApiListMovementTypes(views.APIView):
-    def get(self, request):
-        results = MovementTypeSerializer([{'id': '0', 'name': 'Pedestrian'}, {'id': '1', 'name': 'Bicycle'}],
-                                         many=True).data
-        return Response(results, status=status.HTTP_200_OK, headers={'access-control-allow-origin': '*'})
-
-
-@permission_classes((AllowAny,))
 class ApiListOpenSpaces(views.APIView):
     def get(self, request):
         open_space_c = OpenSpaceConfigController()
@@ -50,9 +42,9 @@ class ApiListOpenSpaceConfig(views.APIView):
     def get(self, request, file_name):
         open_space_cc = OpenSpaceConfigController()
         open_space = open_space_cc.get_open_space(file_name)
-        building_c = BuildingConfigController()
-        open_space.set_buildings(building_c.buildings)
         if open_space:
+            building_c = BuildingConfigController()
+            open_space.set_buildings(building_c.buildings)
             return Response(open_space.get_minimal_dict(),
                             status=status.HTTP_200_OK,
                             headers={'access-control-allow-origin': '*'})
