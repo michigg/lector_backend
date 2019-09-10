@@ -5,7 +5,7 @@
     {
       "name": "Haupttreppe",
       "wheelchair": true,
-      "blocked": "2019-08-10",
+      "blocked": "2019-01-01",
       "coord": [
         10.882902145385742,
         49.895249512228474
@@ -13,7 +13,7 @@
       "entries": [
         {
           "wheelchair": true,
-          "blocked": "2019-08-10",
+          "blocked": "2019-01-01",
           "coord": [
             10.882773399353027,
             49.89526679066847
