@@ -1,0 +1,41 @@
+FROM alpine:3.10
+ADD ["requirements.txt", "/requirements.txt"]
+ENV PROJ_DIR /usr
+RUN apk upgrade --update && \
+    apk add --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ \
+        python3 \
+        python3-dev \
+        build-base \
+        cython \
+        gdal \
+        gdal-dev \
+        py-gdal \
+        geos \
+        py3-pandas \
+        py-numpy-dev \
+        proj \
+        proj-util \
+        proj-dev \
+        freetype-dev \
+        py3-psycopg2 \
+        git \
+        cmake && \
+        rm -rf /var/cache/apk/*
+RUN pip3 install -r /requirements.txt && rm /requirements.txt
+RUN echo "**** compile spatialindex ****" && \
+    git clone https://github.com/libspatialindex/libspatialindex /tmp/spatialindex && \
+    cd /tmp/spatialindex && \
+    cmake . -DCMAKE_INSTALL_PREFIX=/usr && \
+    make && \
+    make install
+RUN apk add tzdata && \
+    cp /usr/share/zoneinfo/Europe/Berlin /etc/localtime && \
+    echo "Europe/Berlin" >  /etc/timezone && \
+    apk del tzdata
+
+WORKDIR /lector
+COPY ./src /lector
+
+EXPOSE 80
+
+CMD ["python3", "manage.py", "runserver", "0.0.0.0:80"]
