@@ -3,6 +3,7 @@
   "building_id": "MG2",
   "staircases": [
     {
+      "id": 1,
       "name": "Haupttreppe",
       "wheelchair": true,
       "coord": [

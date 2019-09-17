@@ -3,10 +3,11 @@
   "building_id": "WE5",
   "staircases": [
     {
+      "id": 1,
       "name": "Treppenhaus Seminarturm",
       "wheelchair": true,
       "neighbours": [
-        "Kleines Treppenhaus Hauptgebäude"
+        2
       ],
       "coord": [
         10.869263112545013,
@@ -86,10 +87,11 @@
       ]
     },
     {
+      "id": 2,
       "name": "Kleines Treppenhaus Hauptgebäude",
       "neighbours": [
-        "Treppenhaus Seminarturm",
-        "Foyer"
+        3,
+        1
       ],
       "coord": [
         10.869775414466858,
@@ -166,10 +168,11 @@
       ]
     },
     {
+      "id": 3,
       "name": "Foyer",
       "wheelchair": true,
       "neighbours": [
-        "Kleines Treppenhaus Hauptgebäude"
+        2
       ],
       "coord": [
         10.87011069059372,

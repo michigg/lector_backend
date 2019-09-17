@@ -3,9 +3,10 @@
   "building_id": "M3",
   "staircases": [
     {
+      "id": 1,
       "name": "Turm",
       "neighbours": [
-        "Haupttreppe"
+        2
       ],
       "coord": [
         10.883663892745972,
@@ -60,10 +61,11 @@
       ]
     },
     {
+      "id": 2,
       "name": "Haupttreppe",
       "wheelchair": true,
       "neighbours": [
-        "Turm"
+        1
       ],
       "coord": [
         10.883814096450806,

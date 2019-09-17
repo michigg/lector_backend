@@ -3,6 +3,7 @@
   "building_id": "MND",
   "staircases": [
     {
+      "id": 1,
       "name": "Haupteingang",
       "wheelchair": true,
       "coord": [

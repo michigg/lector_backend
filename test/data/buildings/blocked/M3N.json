@@ -3,9 +3,10 @@
   "building_id": "M3N",
   "staircases": [
     {
+      "id": 1,
       "name": "Turm",
       "neighbours": [
-        "Haupttreppe"
+        2
       ],
       "blocked": "2019-01-01",
       "coord": [
@@ -61,10 +62,11 @@
       ]
     },
     {
+      "id": 2,
       "name": "Haupttreppenhaus",
       "wheelchair": true,
       "neighbours": [
-        "Turm"
+        1
       ],
       "coord": [
         10.883148908615112,

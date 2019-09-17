@@ -2,6 +2,7 @@
   "building_id": "FG2",
   "staircases": [
     {
+      "id": 1,
       "name": "Haupttreppenhaus",
       "wheelchair": false,
       "coord": [
@@ -27,11 +28,21 @@
       "floors": [
         {
           "level": 0,
-          "ranges": [[0, 10]]
+          "ranges": [
+            [
+              0,
+              10
+            ]
+          ]
         },
         {
           "level": 1,
-          "ranges": [[0, 20]]
+          "ranges": [
+            [
+              0,
+              20
+            ]
+          ]
         }
       ]
     }

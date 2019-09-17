@@ -1,8 +1,9 @@
 {
   "building_id": "FMA",
-   "wheelchair": true,
+  "wheelchair": true,
   "staircases": [
     {
+      "id": 1,
       "name": "Haupteingang",
       "coord": [
         10.90394005179405,
@@ -20,7 +21,12 @@
       "floors": [
         {
           "level": 0,
-          "ranges": [[0, 19]]
+          "ranges": [
+            [
+              0,
+              19
+            ]
+          ]
         }
       ]
     }

@@ -4,6 +4,10 @@ from typing import List
 
 from apps.lector.models import EntryPoint
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class Room:
     def __init__(self, building_key=None, level=None, number=None):
@@ -50,8 +54,9 @@ class BuildingEntryPoint(EntryPoint):
 
 
 class StairCase:
-    def __init__(self, name, floors: List[Floor], coord, entries: List[BuildingEntryPoint], blocked=None,
+    def __init__(self, id: int, name: str, floors: List[Floor], coord, entries: List[BuildingEntryPoint], blocked=None,
                  neighbours=None, wheelchair=False):
+        self.id = id
         self.name = name
         self.coord = coord
         self.entries = entries
@@ -73,10 +78,7 @@ class StairCase:
         return datetime.now() < self.blocked if self.blocked else False
 
     def __str__(self):
-        output = f'Staircase {self.name}\n'
-        for room in self.rooms:
-            output += f'{room}, '
-        return output
+        return f'Staircase ID:{self.id}\n\tName: {self.name}\n\tBlocked: {self.blocked}\n\tNeighbours: {self.neighbours}'
 
 
 class Building:

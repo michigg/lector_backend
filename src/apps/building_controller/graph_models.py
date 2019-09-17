@@ -13,7 +13,7 @@ class GraphBuildingEntryPoint(BuildingEntryPoint, GraphEntryPoint):
 
 class GraphStairCase(StairCase):
     def __init__(self, staircase: StairCase, position_id: int, graph_entries: List[GraphBuildingEntryPoint]):
-        super().__init__(staircase.name, staircase.floors, staircase.coord, staircase.entries, staircase.blocked,
+        super().__init__(staircase.id, staircase.name, staircase.floors, staircase.coord, staircase.entries, staircase.blocked,
                          staircase.neighbours)
         self.position_id = position_id
         self.graph_entries = graph_entries
@@ -33,7 +33,7 @@ class GraphBuilding(Building):
     def get_staircaise_neighbours(self, staircase: StairCase):
         if staircase.neighbours:
             return [graph_staircase for graph_staircase in self.graph_staircases if
-                    graph_staircase.name in staircase.neighbours]
+                    graph_staircase.id in staircase.neighbours]
         return []
 
     def add_staircase_edges(self):

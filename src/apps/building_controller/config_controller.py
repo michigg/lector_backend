@@ -48,7 +48,7 @@ class BuildingConfigController:
         return staircase['name']
 
     @staticmethod
-    def _get_blocked_date(staircase: dict) -> datetime or None:
+    def _get_staircase_blocked_date(staircase: dict) -> datetime or None:
         if "blocked" in staircase:
             return datetime.strptime(staircase['blocked'], "%Y-%m-%d")
         return None
@@ -59,12 +59,17 @@ class BuildingConfigController:
     def _get_staircase_wheelchair(self, staircase: dict):
         return staircase.get("wheelchair", False)
 
+    def _get_staircase_id(self, staircase: dict):
+        return staircase.get("id", -1)
+
     def _get_staircase(self, staircase):
-        return StairCase(self._get_staircase_name(staircase),
-                         self._get_staircase_floors(staircase),
-                         self._get_staircase_coord(staircase),
-                         self._get_staircase_entry_points(staircase),
-                         self._get_blocked_date(staircase),
-                         self._get_staircase_neigbours(staircase),
-                         self._get_staircase_wheelchair(staircase),
-                         )
+        return StairCase(
+            self._get_staircase_id(staircase),
+            self._get_staircase_name(staircase),
+            self._get_staircase_floors(staircase),
+            self._get_staircase_coord(staircase),
+            self._get_staircase_entry_points(staircase),
+            self._get_staircase_blocked_date(staircase),
+            self._get_staircase_neigbours(staircase),
+            self._get_staircase_wheelchair(staircase),
+        )

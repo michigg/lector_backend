@@ -116,6 +116,7 @@ class OSMController:
         graph_open_space.add_walkable_edges()
         graph_open_space.add_restricted_area_edges()
         graph_buildings = self.indoor_map_c.get_graph_buildings(graph_open_space.buildings)
+        logger.warn(graph_buildings)
         self.indoor_map_c.add_buildings_to_graph(graph_buildings)
         graph_open_space.remove_walkable_edges()
         graph_open_space.remove_restricted_area_edges()
