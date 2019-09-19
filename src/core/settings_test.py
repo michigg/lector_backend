@@ -155,5 +155,5 @@ LOGGING = {
 ########################################################################################################################
 OPEN_SPACE_MAX_CACHING_TIME=int(os.environ.get('OPEN_SPACE_MAX_CACHING_TIME', '0'))
 UNIVIS_SEMESTER = os.environ.get('UNIVIS_SEMESTER', "2019s")
-BUILDINGS_CONFIG_DIR = os.environ.get('BUILDINGS_CONFIG_DIR', "/configs/indoor_maps")
-OPEN_SPACES_CONFIG_DIR = os.environ.get('OPEN_SPACES_CONFIG_DIR', "/configs/open_spaces")
+BUILDINGS_CONFIG_DIR = os.environ.get('BUILDINGS_CONFIG_DIR', "/test/data/building_controller/buildings")
+OPEN_SPACES_CONFIG_DIR = os.environ.get('OPEN_SPACES_CONFIG_DIR', "/test/data/open_space_controller/open_spaces")

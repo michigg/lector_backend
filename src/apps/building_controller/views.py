@@ -44,9 +44,9 @@ class ApiBuilding(views.APIView):
 
 @permission_classes((AllowAny,))
 class ApiRoomCoord(views.APIView):
-    def get(self, request, building, level, number):
+    def get(self, request, building_key, level, number):
         room_staircase_c = BuildingController()
-        staircase = room_staircase_c.get_rooms_staircase(Room(building, level, number))
+        staircase = room_staircase_c.get_rooms_staircase(Room(building_key, level, number))
         if staircase:
             staircase_json = json.loads(
                 json.dumps(staircase.__dict__, default=lambda o: o.__dict__ if not isinstance(o, (datetime.date,

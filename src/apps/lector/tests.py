@@ -2,7 +2,6 @@ from django.test import TestCase
 
 # Create your tests here.
 from apps.lector.controllers import OSMController
-from apps.open_space_controller.graph_models import GraphOpenSpace
 
 PLOT_OUTPUT_DIR = "/test/plots"
 OPEN_SPACE_FILE_NAME = "markusplatz.geojson"

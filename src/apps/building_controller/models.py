@@ -23,6 +23,11 @@ class Room:
     def __str__(self):
         return f'{self.building_key}/{self.level:02d}.{self.number}'
 
+    def __eq__(self, other):
+        return self.building_key == other.building_key \
+               and self.number == other.blocked \
+               and self.level == other.level
+
 
 class Floor:
     def __init__(self, level: int or str, ranges: List[List[int]]):
@@ -34,6 +39,10 @@ class Floor:
             if range[0] <= room.get_number() <= range[1]:
                 return True
         return False
+
+    def __eq__(self, other):
+        return self.level == other.level \
+               and self.ranges == other.ranges
 
 
 class BuildingEntryPoint(EntryPoint):
@@ -50,7 +59,12 @@ class BuildingEntryPoint(EntryPoint):
         return False
 
     def __str__(self):
-        return f'BuildingEntryPoint:\n\tOSP_COORD: {self.open_space_coord}\n\tOSP_NODE_ID: {self.open_space_node_id}\n\tGRAPH NODE ID: {self.nearest_graph_node_id}\n\tGRAPH COORD: {self.graph_entry_node_coord}\n\tWHEELCHAIR: {self.wheelchair}'
+        return f'BuildingEntryPoint:\n\tOSP_COORD: {self.open_space_coord}\n\tWHEELCHAIR: {self.wheelchair}'
+
+    def __eq__(self, other):
+        return self.wheelchair == other.wheelchair \
+               and self.blocked == other.blocked \
+               and self.open_space_coord == other.open_space_coord
 
 
 class StairCase:
@@ -80,6 +94,16 @@ class StairCase:
     def __str__(self):
         return f'Staircase ID:{self.id}\n\tName: {self.name}\n\tBlocked: {self.blocked}\n\tNeighbours: {self.neighbours}'
 
+    def __eq__(self, other):
+        return self.id == other.id \
+               and self.name == other.name \
+               and self.coord == other.coord \
+               and self.entries == other.entries \
+               and self.floors == other.floors \
+               and self.blocked == other.blocked \
+               and self.neighbours == other.neighbours \
+               and self.wheelchair == other.wheelchair
+
 
 class Building:
     def __init__(self, key, staircases: List[StairCase]):
@@ -97,3 +121,7 @@ class Building:
         for staircase in self.staircases:
             output += f'{staircase}\n'
         return output
+
+    def __eq__(self, other):
+        return self.key == other.key \
+               and self.staircases == other.staircases

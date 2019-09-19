@@ -13,7 +13,6 @@
       ],
       "entries": [
         {
-          "wheelchair": false,
           "coord": [
             10.883620977401733,
             49.89582315312931
@@ -72,7 +71,7 @@
       ],
       "entries": [
         {
-          "wheelchair": false,
+          "wheelchair": true,
           "coord": [
             10.88393747806549,
             49.89569874965762

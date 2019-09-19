@@ -4,6 +4,8 @@ import os
 from json import JSONDecodeError
 from typing import List
 
+from django.conf import settings
+
 from apps.lector.models import EntryPoint
 from .models import OpenSpace
 
@@ -15,20 +17,24 @@ ENTRY_TYPE = "ENTRY"
 
 
 class OpenSpaceConfigController:
-    def __init__(self, config_dir='/configs/open_spaces'):
+    def __init__(self, config_dir=settings.OPEN_SPACES_CONFIG_DIR):
         self.config_dir = config_dir
         self.open_spaces = self._load_open_spaces()
         logger.info(f'LOADED OPEN SPACES {len(self.open_spaces)}')
 
     def load_geojson(self, file) -> dict or None:
         logger.info(f'LOAD geojson of file {self.config_dir}/{file}')
-        with open(f'{self.config_dir}/{file}') as f:
-            try:
-                geojson = json.load(f)
-                return {'file_name': file, 'geojson': geojson}
-            except JSONDecodeError as e:
-                logger.warn(f"Could not Load json {f.name}")
-                return None
+        try:
+            with open(f'{self.config_dir}/{file}') as f:
+                try:
+                    geojson = json.load(f)
+                    return {'file_name': file, 'geojson': geojson}
+                except JSONDecodeError as e:
+                    logger.warn(f"Could not Load json {f.name}")
+                    return None
+        except FileNotFoundError as e:
+            logger.warn(f"Could not Find json")
+            return None
 
     def get_open_spaces_files(self) -> List:
         return [f for f in os.listdir(self.config_dir) if f.endswith('.geojson') or f.endswith('.json')]

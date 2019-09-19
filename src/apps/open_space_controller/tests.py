@@ -20,21 +20,37 @@ class OpenSpaceControllerApiTest(TestCase):
     def setUp(self) -> None:
         self.client = APIClient()
 
-    def test_movement_types(self):
-        url = reverse('movement-types')
+    def test_api_open_spaces(self):
+        url = reverse('open-spaces')
         response = self.client.get(url, format='json')
-        expected_data = self.load_json('')
-        self.assertEqual(response.data, )
+        expected_data = self.load_json(f'open_spaces_result.json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), expected_data)
 
+    def test_api_open_spaces_geojson(self):
+        url = reverse('open-space-geojson-config', kwargs={'file_name': 'erba.geojson'})
+        response = self.client.get(url, format='json')
+        expected_data = self.load_json(f'open_space_geojson_result.geojson')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), expected_data)
 
-#
-#     def test_with_empty_token(self):
-#         response = self.client.get('/api/v1/univis/rooms/', {'token': ''}, format='json')
-#         self.assertEqual(response.status_code, 400)
-#
-#     def test_without_token(self):
-#         response = self.client.get('/api/v1/univis/rooms/', format='json')
-#         self.assertEqual(response.status_code, 400)
+    def test_api_open_spaces_geojson_with_wrong_filename(self):
+        url = reverse('open-space-geojson-config', kwargs={'file_name': 'missing.geojson'})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_api_open_spaces_details(self):
+        url = reverse('open-space-config', kwargs={'file_name': 'erba.geojson'})
+        response = self.client.get(url, format='json')
+        expected_data = self.load_json(f'open_space_config_result.json')
+        self.assertEqual(response.status_code, 200)
+        print(json.loads(response.content))
+        self.assertEqual(json.loads(response.content), expected_data)
+
+    def test_api_open_spaces_details_with_wrong_filename(self):
+        url = reverse('open-space-config', kwargs={'file_name': 'missing.geojson'})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 400)
 
 
 class OpenSpaceConfigControllerTest(TestCase):

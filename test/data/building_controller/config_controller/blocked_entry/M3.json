@@ -13,7 +13,6 @@
       ],
       "entries": [
         {
-          "wheelchair": false,
           "coord": [
             10.883620977401733,
             49.89582315312931
@@ -62,7 +61,6 @@
     {
       "id": 2,
       "name": "Haupttreppe",
-      "wheelchair": true,
       "neighbours": [
         1
       ],
@@ -72,14 +70,14 @@
       ],
       "entries": [
         {
-          "wheelchair": false,
+          "blocked": "3000-12-12",
           "coord": [
             10.88393747806549,
             49.89569874965762
           ]
         },
         {
-          "wheelchair": false,
+          "blocked": "3000-12-12",
           "coord": [
             10.883757770061493,
             49.895605446843355

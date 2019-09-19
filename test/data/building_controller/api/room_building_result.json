@@ -1,19 +1,21 @@
 {
-  "building_id": "M3",
+  "key": "M3",
   "staircases": [
     {
       "id": 1,
       "name": "Turm",
-      "neighbours": [
-        2
-      ],
       "coord": [
         10.883663892745972,
         49.89579550794111
       ],
       "entries": [
         {
+          "open_space_coord": [
+            10.883620977401733,
+            49.89582315312931
+          ],
           "wheelchair": false,
+          "blocked": null,
           "coord": [
             10.883620977401733,
             49.89582315312931
@@ -57,29 +59,40 @@
             ]
           ]
         }
-      ]
+      ],
+      "blocked": null,
+      "neighbours": [
+        2
+      ],
+      "wheelchair": false
     },
     {
       "id": 2,
       "name": "Haupttreppe",
-      "wheelchair": true,
-      "neighbours": [
-        1
-      ],
       "coord": [
         10.883814096450806,
         49.89561235816914
       ],
       "entries": [
         {
+          "open_space_coord": [
+            10.88393747806549,
+            49.89569874965762
+          ],
           "wheelchair": false,
+          "blocked": null,
           "coord": [
             10.88393747806549,
             49.89569874965762
           ]
         },
         {
+          "open_space_coord": [
+            10.883757770061493,
+            49.895605446843355
+          ],
           "wheelchair": false,
+          "blocked": null,
           "coord": [
             10.883757770061493,
             49.895605446843355
@@ -148,7 +161,12 @@
             ]
           ]
         }
-      ]
+      ],
+      "blocked": "3000-12-12T00:00:00",
+      "neighbours": [
+        1
+      ],
+      "wheelchair": true
     }
   ]
 }
