@@ -104,13 +104,6 @@ class UnivISLectureController(UnivISController):
     def get_lectures_sorted_by_starttime(self, lectures):
         return sorted(lectures, key=lambda lecture: lecture.get_first_term().starttime)
 
-    # TODO: Implement child lectures. Currently not used
-    # def get_lecture_map_by_univis_id(self, lectures: List[Lecture]):
-    #     lecture_map = {}
-    #     for lecture in lectures:
-    #         lecture_map[lecture.univis_key] = lecture
-    #     return lecture_map
-
 
 class UnivISRoomController(UnivISController):
     def __init__(self):

@@ -41,7 +41,11 @@ class UnivisControllerLecturesApiTest(TestCase):
         with open(f'{TEST_DATA_DIR}/mobass_lectures.json', 'r') as f:
             expected_lectures_json = json.load(f)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, expected_lectures_json)
+        response_data = str(json.loads(response.content))
+        self.assertTrue(response_data.find(str(expected_lectures_json['before'][0])) > -1)
+        self.assertTrue(response_data.find(str(expected_lectures_json['before'][1])) > -1)
+        self.assertTrue(response_data.find("before") > -1)
+        self.assertTrue(response_data.find("after") > -1)
 
     def test_with_token_results_in_no_content(self):
         response = self.client.get('/api/v1/univis/lectures/', {'token': 'asdf'}, format='json')

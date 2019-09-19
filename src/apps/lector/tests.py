@@ -1,11 +1,49 @@
-from django.test import TestCase
+import json
+import tempfile
+
+from django.test import TestCase, override_settings
 
 # Create your tests here.
+from django.urls import reverse
+from rest_framework.test import APIClient
+
 from apps.lector.controllers import OSMController
 
 PLOT_OUTPUT_DIR = "/test/plots"
 OPEN_SPACE_FILE_NAME = "markusplatz.geojson"
 BLOCKED_OPEN_SPACE_FILE_NAME = "markusplatz_blocked.geojson"
+TEST_DIR = "/test/data/lector"
+
+
+class LectorApiTest(TestCase):
+    def load_json(self, file_name) -> dict:
+        with open(f'{TEST_DIR}/api/{file_name}', 'r') as f:
+            return json.load(f)
+
+    def setUp(self) -> None:
+        self.client = APIClient()
+
+    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
+    def test_api_open_space_plot(self):
+        url = reverse('open-space-plot', kwargs={'file_name': 'erba.geojson'})
+        response = self.client.get(url, format='json')
+        expected_data = self.load_json(f'plot_url_result.json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), expected_data)
+
+    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
+    def test_api_open_space_plot_cache(self):
+        url = reverse('open-space-plot', kwargs={'file_name': 'erba.geojson'})
+        self.client.get(url, format='json')
+        response = self.client.get(url, format='json')
+        expected_data = self.load_json(f'plot_url_result.json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), expected_data)
+
+    def test_api_open_space_plot_with_wrong_filename(self):
+        url = reverse('open-space-plot', kwargs={'file_name': 'missing.geojson'})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 400)
 
 
 class GraphTests(TestCase):
