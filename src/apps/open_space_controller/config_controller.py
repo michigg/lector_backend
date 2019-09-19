@@ -17,6 +17,10 @@ ENTRY_TYPE = "ENTRY"
 
 
 class OpenSpaceConfigController:
+    """
+    Controll the Open Space config files
+    """
+
     def __init__(self, config_dir=settings.OPEN_SPACES_CONFIG_DIR):
         self.config_dir = config_dir
         self.open_spaces = self._load_open_spaces()
@@ -50,6 +54,7 @@ class OpenSpaceConfigController:
         return geojsons
 
     def _load_open_space(self, data: dict) -> OpenSpace or None:
+        """Check config and load the json file to an OpenSpace instance"""
         walkables = []
         restricted = []
         blocked = []
@@ -97,7 +102,8 @@ class OpenSpaceConfigController:
             with open(f'{self.config_dir}/{file}', 'w') as f:
                 json.dump(geojson['geojson'], f)
 
-    def get_colored_geojson(self, file):
+    def get_colored_geojson(self, file) -> dict:
+        """Coloring a open space config file. Returns colored geojson"""
         geojson = self.load_geojson(file)
         for feature in geojson['geojson']['features']:
             polygon = feature['geometry']['coordinates'][0]

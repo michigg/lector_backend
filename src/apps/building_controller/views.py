@@ -23,6 +23,9 @@ Author: Michael Götz
 
 @permission_classes((AllowAny,))
 class ApiBuildings(views.APIView):
+    """
+    Returns all building config file names
+    """
     def get(self, request):
         request.GET.get('from_lat', None)
         building_c = BuildingConfigController()
@@ -34,6 +37,9 @@ class ApiBuildings(views.APIView):
 
 @permission_classes((AllowAny,))
 class ApiBuilding(views.APIView):
+    """
+    Return a specific building config
+    """
     def get(self, request, file_name):
         building_c = BuildingConfigController()
         building_json = building_c.get_building_config(file_name)
@@ -44,6 +50,9 @@ class ApiBuilding(views.APIView):
 
 @permission_classes((AllowAny,))
 class ApiRoomCoord(views.APIView):
+    """
+    Return the staircase that includes the room
+    """
     def get(self, request, building_key, level, number):
         room_staircase_c = BuildingController()
         staircase = room_staircase_c.get_rooms_staircase(Room(building_key, level, number))
@@ -61,6 +70,9 @@ class ApiRoomCoord(views.APIView):
 
 @permission_classes((AllowAny,))
 class ApiRoomBuilding(views.APIView):
+    """
+    Return the building that includes the room
+    """
     def get(self, request, building_key, level, number):
         room_staircase_c = BuildingController()
         building = room_staircase_c.get_rooms_building(Room(building_key, level, number))

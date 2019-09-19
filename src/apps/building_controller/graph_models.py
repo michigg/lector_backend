@@ -13,15 +13,18 @@ class GraphBuildingEntryPoint(BuildingEntryPoint, GraphEntryPoint):
 
 class GraphStairCase(StairCase):
     def __init__(self, staircase: StairCase, position_id: int, graph_entries: List[GraphBuildingEntryPoint]):
-        super().__init__(staircase.id, staircase.name, staircase.floors, staircase.coord, staircase.entries, staircase.blocked,
+        super().__init__(staircase.id,
+                         staircase.name,
+                         staircase.floors,
+                         staircase.coord,
+                         staircase.entries,
+                         staircase.blocked,
                          staircase.neighbours)
         self.position_id = position_id
         self.graph_entries = graph_entries
 
     def get_not_blocked_entries(self):
-        if self.is_blocked():
-            return []
-        return [entry for entry in self.graph_entries if not entry.is_blocked()]
+        return [] if self.is_blocked() else [entry for entry in self.graph_entries if not entry.is_blocked()]
 
 
 class GraphBuilding(Building):
@@ -30,13 +33,17 @@ class GraphBuilding(Building):
         self.osmm = osmm
         self.graph_staircases = graph_staircases
 
-    def get_staircaise_neighbours(self, staircase: StairCase):
-        if staircase.neighbours:
+    def get_staircaise_neighbours(self, staircase: StairCase) -> List[GraphStairCase]:
+        if not staircase.neighbours:
             return [graph_staircase for graph_staircase in self.graph_staircases if
                     graph_staircase.id in staircase.neighbours]
         return []
 
     def add_staircase_edges(self):
+        """
+        Insert staircase edges into the main graph
+        :return:
+        """
         for graph_staircase in self.graph_staircases:
             if not graph_staircase.is_blocked():
                 for entry in graph_staircase.graph_entries:

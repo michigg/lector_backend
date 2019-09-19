@@ -8,9 +8,12 @@ logger = logging.getLogger(__name__)
 
 
 class DockerController:
+    """
+    Control basic docker functions
+    """
+
     @staticmethod
     def get_container_by_service_name(service_name):
-        # TODO check multiple container
         client = docker.from_env()
         for container in client.containers.list(all=True):
             pattern = re.compile(f'.*{service_name}.*')
@@ -25,12 +28,19 @@ class DockerController:
 
 
 class DockerGraphhopperController(DockerController):
+    """
+    Control initialization and restart of the graphhopper service
+    """
+
     def __init__(self, graphhopper_service_name, osm_output_dir, osm_output_filename):
         self.graphhopper_service_name = graphhopper_service_name
         self.osm_output_dir = osm_output_dir
         self.osm_output_filename = osm_output_filename
 
     def clean_graphhopper_restart(self):
+        """
+        Remove old graphhopper files first and restart or start the service
+        """
         logger.info("Restart Graphhopper Container")
         self._remove_current_graphhopper_data()
         self.restart_container_by_service_name(self.graphhopper_service_name)

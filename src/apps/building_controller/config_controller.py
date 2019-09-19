@@ -3,7 +3,7 @@ import logging
 import os
 from datetime import datetime
 from json import JSONDecodeError
-from typing import List
+from typing import List, Union
 
 from django.conf import settings
 
@@ -13,28 +13,42 @@ logger = logging.getLogger(__name__)
 
 
 class BuildingConfigController:
+    """
+    Load and control building config files
+    """
+
     def __init__(self, config_dir=settings.BUILDINGS_CONFIG_DIR):
         self.config_dir = config_dir
         self.buildings = self.get_buildings()
         logger.info(f'LOADED BUILDINGS {len(self.buildings)}')
 
-    def get_building_config(self, file):
+    def get_building_config(self, file: str) -> dict or None:
+        """
+        Load json from file
+
+        :param file: file that includes json data
+        :return: json dict or None if the json could not be loaded
+        """
         logger.info(f'LOAD json of file {self.config_dir}/{file}')
         try:
             with open(f'{self.config_dir}/{file}') as f:
                 try:
                     return json.load(f)
-                except JSONDecodeError as e:
-                    logger.warn(f"Could not Load json {f.name}")
+                except JSONDecodeError:
+                    logger.warning(f"Could not Load json {f.name}")
                     return None
-        except FileNotFoundError as e:
-            logger.warn(f"Could not find json")
+        except FileNotFoundError:
+            logger.warning(f"Could not find json")
             return None
 
-    def get_building_config_files(self) -> List:
+    def get_building_config_files(self) -> List[Union[bytes, str]]:
         return [f for f in os.listdir(self.config_dir) if f.endswith('.json')]
 
     def get_buildings(self) -> List[Building]:
+        """
+        Load building json configs from config_dir
+        :return: loaded Buildings
+        """
         buildings = []
         for file in self.get_building_config_files():
             building_config = self.get_building_config(file)
@@ -71,13 +85,16 @@ class BuildingConfigController:
             return datetime.strptime(staircase['blocked'], "%Y-%m-%d")
         return None
 
-    def _get_staircase_neigbours(self, staircase: dict) -> List[int] or None:
+    @staticmethod
+    def _get_staircase_neigbours(staircase: dict) -> List[int] or None:
         return staircase.get("neighbours", None)
 
-    def _get_staircase_wheelchair(self, staircase: dict) -> bool:
+    @staticmethod
+    def _get_staircase_wheelchair(staircase: dict) -> bool:
         return staircase.get("wheelchair", False)
 
-    def _get_staircase_id(self, staircase: dict) -> int:
+    @staticmethod
+    def _get_staircase_id(staircase: dict) -> int:
         return staircase.get("id", -1)
 
     def _get_staircase(self, staircase) -> StairCase:

@@ -16,6 +16,9 @@ class Room:
         self.level = int(level)
 
     def get_number(self):
+        """
+        :return: only the room number part
+        """
         pattern = re.compile('([0-9]*).*')
         match = pattern.match(self.number)
         return int(match.group())
@@ -34,7 +37,7 @@ class Floor:
         self.level = level
         self.ranges = ranges
 
-    def is_floor_room(self, room: Room):
+    def is_floor_room(self, room: Room) -> bool:
         for range in self.ranges:
             if range[0] <= room.get_number() <= range[1]:
                 return True
@@ -49,14 +52,10 @@ class BuildingEntryPoint(EntryPoint):
     def __init__(self, data: dict):
         super().__init__(data['coord'])
         self.wheelchair = data.get('wheelchair', False)
-        self.blocked = None
-        if 'blocked' in data:
-            self.blocked = datetime.strptime(data['blocked'], "%Y-%m-%d")
+        self.blocked = None if 'blocked' not in data else datetime.strptime(data['blocked'], "%Y-%m-%d")
 
-    def is_blocked(self):
-        if self.blocked:
-            return datetime.now() < self.blocked
-        return False
+    def is_blocked(self) -> bool:
+        return datetime.now() < self.blocked if self.blocked else False
 
     def __str__(self):
         return f'BuildingEntryPoint:\n\tOSP_COORD: {self.open_space_coord}\n\tWHEELCHAIR: {self.wheelchair}'
@@ -79,7 +78,11 @@ class StairCase:
         self.neighbours = neighbours
         self.wheelchair = wheelchair
 
-    def is_staircase_room(self, room: Room):
+    def is_staircase_room(self, room: Room) -> bool:
+        """
+        :param room: room that should be checked
+        :return: true if room is reachable by the staircase
+        """
         for floor in self.floors:
             if room.level == floor.level and floor.is_floor_room(room):
                 return True
@@ -111,6 +114,10 @@ class Building:
         self.staircases = staircases
 
     def get_rooms_staircase(self, room: Room) -> StairCase or None:
+        """
+        :param room: room which staircase should be found
+        :return: if a staircase could be found, the stairce else None
+        """
         for staircase in self.staircases:
             if staircase.is_staircase_room(room):
                 return staircase

@@ -8,5 +8,5 @@ urlpatterns = [
     path('buildings/<str:file_name>/', views.ApiBuilding.as_view(), name='building'),
     path('buildings/<str:building_key>/<str:level>/<str:number>/', views.ApiRoomBuilding.as_view(),
          name='room-building'),
-    path('buildings/<str:building_key>/staircases/<str:level>/<str:number>/', views.ApiRoomCoord.as_view(), name='staircase-room'),
+    path('buildings/<str:building_key>/staircases/<str:level>/<str:number>/coord/', views.ApiRoomCoord.as_view(), name='staircase-room'),
 ]

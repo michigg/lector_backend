@@ -21,6 +21,11 @@ Author: Michael Götz
 
 @permission_classes((AllowAny,))
 class ApiOpenSpacePlot(views.APIView):
+    """
+    Build the visibility graph for a specific open space, save the graph and returns the save location.
+    Implements simple caching controlled over setting attribute
+    """
+
     def get(self, request, file_name):
         osmm = OSMController()
         open_space = osmm.osp_config_c.get_open_space(file_name)

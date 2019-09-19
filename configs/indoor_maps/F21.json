@@ -5,8 +5,8 @@
       "id": 1,
       "name": "Vorne Rechts",
       "neighbours": [
-        "Vorne Links",
-        "Hinten Rechts"
+        5,
+        3
       ],
       "coord": [
         10.904827862977982,

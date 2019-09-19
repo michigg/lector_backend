@@ -11,11 +11,15 @@ from apps.open_space_controller.models import OpenSpace
 
 
 class OpenSpaceEntryPoint(EntryPoint):
-    def __init__(self, coord: List[List[float]]):
+    def __init__(self, coord: List[float]):
         super().__init__(coord)
 
 
 class GraphOpenSpaceEntryPoint(OpenSpaceEntryPoint, GraphEntryPoint):
+    """
+    Extend OpenSpaceEntryPoint with graph functions
+    """
+
     def __init__(self, entry_point: OpenSpaceEntryPoint, osmm, open_space):
         self.open_space_coord = entry_point.open_space_coord
         GraphEntryPoint.__init__(self, entry_point=entry_point, osmm=osmm)
@@ -68,6 +72,13 @@ class GraphOpenSpace(OpenSpace):
         self.osmm.add_osm_edge(from_id, to_id, self.get_name())
 
     def edge_intersects_other_restricted_areas(self, line: LineString, restricted_area_poly: Polygon) -> bool:
+        """
+        check if a linestring intersects with other as restricted marked polygons which are different from the given restricted_Area_poly
+
+        :param line: the linestring which shall be checked
+        :param restricted_area_poly: the polygon which shall be excluded
+        :return: true if the linstring don't intesect other restricted polygon and touches the given polygon
+        """
         other_restricted_areas = self._get_other_restricted_area_polys(restricted_area_poly)
         for other_restricted_area in other_restricted_areas:
             other_areas = self._get_other_restricted_area_polys(other_restricted_area)
@@ -77,6 +88,9 @@ class GraphOpenSpace(OpenSpace):
         return self._is_restricted_line(line, other_restricted_areas)
 
     def add_visibility_graph_edges(self):
+        """
+        Adds visibility edges to the main graph
+        """
         nodes = self.get_all_nodes()
         for node_from in nodes:
             for node_to in nodes:
@@ -109,6 +123,11 @@ class GraphOpenSpace(OpenSpace):
             self._remove_polygon_edges(blocked_area_nodes)
 
     def add_building_entry_to_open_space(self, entry_point):
+        """
+        Add the building entry point to the correct polygon an the open space
+
+        :param entry_point: the buildings entry point
+        """
         if self._is_open_space_walkable_node(entry_point.graph_entry_edge[0]):
             self._insert_sorted(entry_point.nearest_graph_node_id, entry_point.graph_entry_edge[0],
                                 self.walkable_area_nodes)
@@ -127,8 +146,10 @@ class GraphOpenSpace(OpenSpace):
     def get_name(self):
         return f'Freifläche {os.path.splitext(self.file_name)[0].upper()}'
 
-    # Better naming all nodes without blocked space
     def get_all_nodes(self) -> List[int]:
+        """
+        :return: a list including the walkable and restriced polygon nodes
+        """
         nodes = []
         nodes.extend(self.walkable_area_nodes)
         for restricted_area_nodes in self.restricted_areas_nodes:
@@ -160,6 +181,11 @@ class GraphOpenSpace(OpenSpace):
         return other_restricted_area_polys
 
     def _is_visible_edge(self, edge: LineString) -> bool:
+        """
+        check if the given edge is a visibile one. This means that it not intesects a blocking area and not intersects a restricted area
+        :param edge: edge which shall be checked
+        :return: true if condition is fullfilled
+        """
         if self._is_internal_edge(edge):
             is_blocked = any([prep(blocked_poly).intersects(edge) for blocked_poly in self.blocked_area_polys])
             if not is_blocked:
