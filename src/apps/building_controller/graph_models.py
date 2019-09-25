@@ -34,7 +34,7 @@ class GraphBuilding(Building):
         self.graph_staircases = graph_staircases
 
     def get_staircaise_neighbours(self, staircase: StairCase) -> List[GraphStairCase]:
-        if not staircase.neighbours:
+        if staircase.neighbours:
             return [graph_staircase for graph_staircase in self.graph_staircases if
                     graph_staircase.id in staircase.neighbours]
         return []
