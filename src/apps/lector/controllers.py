@@ -32,14 +32,15 @@ class OSMController:
         building_cc = BuildingConfigController(config_dir=building_config_dir)
         self.indoor_map_c = GraphBuildingController(self, building_cc=building_cc)
 
-    def create_bbox_open_spaces_plot(self):
+    def create_bbox_open_spaces_plot(self, bbox=None):
         open_spaces = self.osp_config_c.get_open_spaces()
         buildings = self.indoor_map_c.building_cc.get_buildings()
-        self.graph = self.download_map()
+        self.graph = self.download_map(bbox) if bbox else self.download_map()
 
         for open_space in open_spaces:
-            graph_open_space = GraphOpenSpace(open_space, osmm=self)
-            self._insert_open_space(buildings, graph_open_space)
+            if self._is_contained_open_space(open_space, bbox):
+                graph_open_space = GraphOpenSpace(open_space, osmm=self)
+                self._insert_open_space(buildings, graph_open_space)
         self.plot_graph()
 
     def create_complete_open_space_plot(self, open_space, output_dir="/osm_data", file_name=None):
@@ -209,3 +210,10 @@ class OSMController:
         self.graph = self.download_map(open_space.get_boundaries(boundary_degree_extension=0.0005))
         graph_open_space = GraphOpenSpace(open_space, osmm=self)
         return graph_open_space
+
+    def _is_contained_open_space(self, open_space: OpenSpace, bbox: BBox):
+        open_space_bbox = open_space.get_boundaries()
+        return bbox.min_lat < open_space_bbox.min_lat \
+               and bbox.min_lon < open_space_bbox.min_lon \
+               and bbox.max_lat > open_space_bbox.max_lat \
+               and bbox.max_lon > open_space_bbox.max_lon
