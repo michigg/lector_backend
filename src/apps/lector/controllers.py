@@ -1,4 +1,5 @@
 import logging
+from enum import Enum
 from typing import List
 
 import osmnx as ox
@@ -22,6 +23,26 @@ SERVICE_NAME = 'graphhopper'
 
 OPEN_SPACE_CONFIG_DIR = "/configs/open_spaces"
 BUILDING_CONFIG_DIR = "/configs/indoor_maps"
+
+
+class EDGE_TYPES(Enum):
+    NORMAL = 0
+    OPEN_SPACE_ENTRY = 1
+    OPEN_SPACE_VISIBLITY = 2
+    OPEN_SPACE_WALKABLE = 3
+    OPEN_SPACE_RESTRICTED = 4
+    BUILDING_ENTRY = 5
+    BUILDING_STAIRCASE = 6
+
+
+COLOR_MAP = {EDGE_TYPES.NORMAL: "#000000",
+             EDGE_TYPES.OPEN_SPACE_ENTRY: "#0f0f0f",
+             EDGE_TYPES.OPEN_SPACE_VISIBLITY: "#9ccc3c",
+             EDGE_TYPES.OPEN_SPACE_RESTRICTED: "#e70066",
+             EDGE_TYPES.OPEN_SPACE_WALKABLE: "#14278d",
+             EDGE_TYPES.BUILDING_ENTRY: "#5d2612",
+             EDGE_TYPES.BUILDING_STAIRCASE: "#9ccc3c"
+             }
 
 
 class OSMController:
@@ -82,20 +103,22 @@ class OSMController:
                           )
         logger.info(f'Saved osm xml to {OSM_OUTPUT_DIR}/{OSM_OUTPUT_FILENAME}.osm')
 
-    def add_osm_edge(self, from_id, to_id, name, maxspeed=None):
+    def add_osm_edge(self, from_id, to_id, name, maxspeed=None, type=EDGE_TYPES.NORMAL):
         if maxspeed:
             self.graph.add_edge(from_id, to_id,
                                 highway='pedestrian',
                                 lanes='1',
                                 name=name,
                                 oneway=True,
-                                maxspeed=maxspeed, )
+                                maxspeed=maxspeed,
+                                color_label=type)
         else:
             self.graph.add_edge(from_id, to_id,
                                 highway='pedestrian',
                                 lanes='1',
                                 name=name,
-                                oneway=True, )
+                                oneway=True,
+                                color_label=type)
 
     def add_osm_node(self, coords: List[List[float]]):
         node_id = self._get_new_node_id()
