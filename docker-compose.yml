@@ -8,8 +8,8 @@ services:
   lector:
     image: lector:0.1
     build:
-      context: docker/lector
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: docker/lector/Dockerfile.dev
     networks:
       - pg_db
     env_file:

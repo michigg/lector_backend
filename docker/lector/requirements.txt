@@ -1,11 +1,11 @@
 Django==2.2.2
-djangorestframework==3.9.4
-django-filter==2.1.0
-Markdown==3.1.1
+djangorestframework==3.11.0
+django-filter==2.3.0
+Markdown==3.2.2
 #pydriosm==1.0.14
 # Install debian libgeos-dev libgdal-dev proj>6.0.0
-numpy==1.16.4
-gdal==2.4.0
-osmnx==0.10
-docker==4.0.2
+numpy==1.18.5
+gdal==3.1.0
+osmnx==0.14.1
+docker==4.2.1
 xmltodict==0.12.0
