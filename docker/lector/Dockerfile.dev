@@ -1,12 +1,12 @@
-FROM alpine:3.12
+FROM alpine:edge
 ADD ["docker/lector/requirements.txt", "/requirements.txt"]
 ENV PROJ_DIR /usr
 RUN apk upgrade --update && \
     apk add --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ \
         python3 \
         python3-dev \
-	py3-pip \
- 	py3-wheel \
+        py3-pip \
+        py3-wheel \
         build-base \
         cython \
 #        gdal \
@@ -21,6 +21,8 @@ RUN apk upgrade --update && \
         freetype-dev \
         py3-psycopg2 \
         git \
+        jpeg-dev \
+        zlib-dev \
         cmake && \
         rm -rf /var/cache/apk/*
 RUN echo "**** compile spatialindex ****" && \

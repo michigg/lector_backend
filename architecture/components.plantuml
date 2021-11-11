@@ -1,0 +1,23 @@
+@startuml
+
+[Lector Frontend] -- [Lector]
+[Lector Frontend] -- [Open Space API]
+[Lector Frontend] -- [Building API]
+[Lector Frontend] -- [Graphhopper]
+[Lector Frontend] -right- [VGN API]
+[Lector Frontend] -left- [GoogleMaps API]
+[Lector Frontend] -- [UnivIS API]
+
+[Building API] -- [Lector]
+[Open Space API] -- [Lector]
+[Lector] -- [Docker Controller]
+[Lector] -- [Graphhopper]
+[Graphhopper] -right- [Docker Controller]
+
+
+[RooFiS2 Frontend] -- [Building API]
+[RooFiS2 Frontend] -- [RooFiS2 API]
+[RooFiS2 API] -down-- [UnivIS API]
+[RooFiS2 Frontend] -- [UniInfo API]
+
+@enduml
