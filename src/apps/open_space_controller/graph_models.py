@@ -132,7 +132,7 @@ class GraphOpenSpace(OpenSpace):
             self._insert_sorted(entry_point.nearest_graph_node_id, entry_point.graph_entry_edge[0],
                                 self.walkable_area_nodes)
             self.walkable_area_poly = Polygon(
-                [[self.osmm.graph.node[node]['x'], self.osmm.graph.node[node]['y']] for node in
+                [[self.osmm.graph.nodes()[node]['x'], self.osmm.graph.nodes()[node]['y']] for node in
                  self.walkable_area_nodes])
             self.walkable_area_prep_poly = prep(self.walkable_area_poly)
         restricted_area_id = self._get_open_space_restricted_area_id(entry_point.graph_entry_edge[0])
@@ -140,7 +140,7 @@ class GraphOpenSpace(OpenSpace):
             self._insert_sorted(entry_point.nearest_graph_node_id, entry_point.graph_entry_edge[0],
                                 self.restricted_areas_nodes[restricted_area_id])
             self.restricted_area_polys[restricted_area_id] = Polygon(
-                [[self.osmm.graph.node[node]['x'], self.osmm.graph.node[node]['y']] for node in
+                [[self.osmm.graph.nodes()[node]['x'], self.osmm.graph.nodes()[node]['y']] for node in
                  self.restricted_areas_nodes[restricted_area_id]])
 
     def get_name(self):

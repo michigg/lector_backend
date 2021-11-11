@@ -1,8 +1,10 @@
 import logging
+from collections import namedtuple
 from enum import Enum
 from typing import List
 
 import osmnx as ox
+from shapely.geometry import LineString
 
 from apps.building_controller.config_controller import BuildingConfigController
 from apps.building_controller.controller import GraphBuildingController
@@ -83,22 +85,19 @@ class OSMController:
         if output_dir and file_name and not minimized:
             ox.plot_graph(self.graph,
                           save=True,
-                          file_format='svg',
-                          filename=f'{output_dir}/{file_name}',
+                          filepath=f'{output_dir}/{file_name}.svg',
                           edge_linewidth=0.5,
                           node_size=1)
         else:
             ox.plot_graph(self.graph,
                           save=True,
-                          file_format='svg',
-                          filename=f'{OSM_OUTPUT_DIR}/network_plot',
+                          filepath=f'{OSM_OUTPUT_DIR}/network_plot.svg',
                           edge_linewidth=0.025,
                           node_size=0.1)
 
     def save_graph(self):
-        ox.save_graph_osm(self.graph,
-                          filename=f'{OSM_OUTPUT_FILENAME}.osm',
-                          folder=OSM_OUTPUT_DIR,
+        ox.save_graph_xml(self.graph,
+                          filepath=f'{OSM_OUTPUT_DIR}/{OSM_OUTPUT_FILENAME}.osm'
                           # oneway=False,
                           )
         logger.info(f'Saved osm xml to {OSM_OUTPUT_DIR}/{OSM_OUTPUT_FILENAME}.osm')
@@ -129,21 +128,32 @@ class OSMController:
         self.current_osm_id += 1
         return self.current_osm_id
 
-    def get_nearest_edge(self, coord):
-        return ox.get_nearest_edge(self.graph, coord[::-1])
+    def get_nearest_edge(self, coord) -> (int, int, int, LineString):
+        x = coord[0]
+        y = coord[1]
+        # Returns nearest edge with (startNodeId, stopNodeId, edgeId)
+        nearest_edge = ox.nearest_edges(self.graph, x, y)
+        start_node_coord = self.get_coord_from_id(nearest_edge[0])
+        stop_node_coord = self.get_coord_from_id(nearest_edge[1])
+        print("get_nearest_edge", coord, start_node_coord, stop_node_coord)
+        result = namedtuple("NearestEdge", ["start_node_id", "stop_node_id", "edge_id", "geom"])
+        return result(*nearest_edge, LineString(coordinates=[start_node_coord, stop_node_coord]))
 
     def get_coord_from_id(self, node_id):
-        node = self.graph.node[node_id]
+        node = self.graph.nodes()[node_id]
         return [node['x'], node['y']]
 
     def _insert_building_to_graph(self, graph_open_space):
         graph_open_space.add_walkable_edges()
         graph_open_space.add_restricted_area_edges()
+
         graph_buildings = self.indoor_map_c.get_graph_buildings(graph_open_space.buildings)
-        logger.warn(graph_buildings)
+        logger.info(f'_insert_building_to_graph: Graph Buildings: {graph_buildings}')
         self.indoor_map_c.add_buildings_to_graph(graph_buildings)
+
         graph_open_space.remove_walkable_edges()
         graph_open_space.remove_restricted_area_edges()
+
         self.plot_graph(output_dir="/osm_data", file_name=f'{graph_open_space.file_name}_building_without_entry',
                         minimized=False)
         for building in graph_buildings:
@@ -153,11 +163,11 @@ class OSMController:
         self.plot_graph(output_dir="/osm_data", file_name=f'{graph_open_space.file_name}_building', minimized=False)
 
     def _insert_open_space(self, buildings: List[Building], graph_open_space: GraphOpenSpace):
-        self._instert_open_space_buildings(buildings, graph_open_space)
+        self._insert_open_space_buildings(buildings, graph_open_space)
         self._insert_open_space_visibility_graph(graph_open_space)
         self._insert_open_space_entries(graph_open_space)
 
-    def _instert_open_space_buildings(self, buildings: List[Building], graph_open_space: GraphOpenSpace):
+    def _insert_open_space_buildings(self, buildings: List[Building], graph_open_space: GraphOpenSpace):
         graph_open_space.set_buildings(buildings)
         self._insert_building_to_graph(graph_open_space)
 
@@ -221,7 +231,7 @@ class OSMController:
     def create_open_space_buildings_plot(self, open_space: OpenSpace, buildings: [], output_dir="/osm_data",
                                          file_name=None):
         graph_open_space = self._init_open_space_graph(open_space)
-        self._instert_open_space_buildings(buildings, graph_open_space)
+        self._insert_open_space_buildings(buildings, graph_open_space)
         self._insert_open_space_walkable(graph_open_space)
         self._insert_open_space_restricted(graph_open_space)
         self._insert_open_space_entries(graph_open_space)
